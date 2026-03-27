@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프라모델 아카이브</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --surface2: #1e2430;
+    --border: #2a3040;
+    --accent: #c8a96e;
+    --accent2: #7eb8d4;
+    --accent3: #e07c5a;
+    --text: #d8dde8;
+    --text-dim: #6b7585;
+    --text-bright: #ffffff;
+    --success: #5cb87a;
+    --warning: #d4a843;
+    --danger: #c95f5f;
+    --radius: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  .logo span { color: var(--text-dim); font-weight: 400; font-size: 12px; margin-left: 8px; letter-spacing: 0; }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+  }
+
+  .hstat {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .hstat strong {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    height: calc(100vh - 60px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 16px 0;
+    overflow-y: auto;
+  }
+
+  .nav-group {
+    margin-bottom: 8px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 4px 16px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 13px;
+    color: var(--text-dim);
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(200,169,110,0.08); color: var(--accent); border-left-color: var(--accent); }
+
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+
+  .section-title span {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--accent);
+    margin-left: 10px;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text-dim); }
+
+  select.filter {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { opacity: 0.85; }
+  .btn.secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(42,48,64,0.6);
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .tag-o { background: rgba(92,184,122,0.15); color: var(--success); border: 1px solid rgba(92,184,122,0.3); }
+  .tag-x { background: rgba(201,95,95,0.15); color: var(--danger); border: 1px solid rgba(201,95,95,0.3); }
+  .tag-d { background: rgba(212,168,67,0.15); color: var(--warning); border: 1px solid rgba(212,168,67,0.3); }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .chip-planned { background: rgba(126,184,212,0.1); color: var(--accent2); border: 1px solid rgba(126,184,212,0.3); }
+  .chip-done { background: rgba(92,184,122,0.1); color: var(--success); border: 1px solid rgba(92,184,122,0.3); }
+  .chip-wip { background: rgba(200,169,110,0.1); color: var(--accent); border: 1px solid rgba(200,169,110,0.3); }
+
+  /* CARDS for dashboard */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .card-a::before { background: var(--accent); }
+  .card-b::before { background: var(--accent2); }
+  .card-c::before { background: var(--accent3); }
+  .card-d::before { background: var(--success); }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .card-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-bright);
+    line-height: 1;
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: min(700px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  }
+
+  .modal-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body {
+    padding: 24px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  /* COLOR SWATCH */
+  .color-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* PRIORITY BADGE */
+  .priority {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* SECTION panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* NOTICE */
+  .notice {
+    background: rgba(200,169,110,0.08);
+    border: 1px solid rgba(200,169,110,0.2);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  .empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+  /* action icon buttons */
+  .action-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Dropdown nation select */
+  .nation-flag { margin-right: 4px; }
+
+  .brand-pill {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    white-space: nowrap;
+  }
+
+  .brand-tamiya { border-color: rgba(200,80,80,0.4); color: #e08080; }
+  .brand-vallejo { border-color: rgba(80,140,200,0.4); color: #80aae0; }
+  .brand-mig { border-color: rgba(180,140,80,0.4); color: #d4a85a; }
+  .brand-ak { border-color: rgba(120,180,120,0.4); color: #90c890; }
+  .brand-gunze { border-color: rgba(160,120,200,0.4); color: #c0a0e0; }
+
+  /* Stats row for dashboard */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .stat-icon {
+    font-size: 24px;
+    width: 40px;
+    text-align: center;
+  }
+
+  .stat-info { flex: 1; }
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+
+  .stat-label { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  /* Nation distribution */
+  .dist-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(42,48,64,0.4);
+    font-size: 13px;
+  }
+
+  .dist-row:last-child { border-bottom: none; }
+  .dist-name { width: 80px; color: var(--text-dim); }
+  .dist-bar-wrap { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .dist-bar { height: 100%; border-radius: 3px; background: var(--accent); }
+  .dist-num { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); min-width: 24px; text-align: right; }
+
+  /* Recent activity */
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(42,48,64,0.4);
+    font-size: 12px;
+  }
+
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 4px; flex-shrink: 0; }
+  .activity-text { flex: 1; color: var(--text); }
+  .activity-time { color: var(--text-dim); }
+
+  @media (max-width: 768px) {
+    .sidebar { width: 160px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+    .header-stats { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">PRAMA<span>모델 관리 시스템</span></div>
+  <div class="header-stats">
+    <div class="hstat"><strong id="hs-models">0</strong>총 모델</div>
+    <div class="hstat"><strong id="hs-done">0</strong>제작완료</div>
+    <div class="hstat"><strong id="hs-planned">0</strong>제작계획</div>
+    <div class="hstat"><strong id="hs-paints">0</strong>보유도료</div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-group">
+      <div class="nav-label">대시보드</div>
+      <div class="nav-item active" onclick="showPanel('dashboard')">
+        <span class="nav-icon">📊</span> 현황 요약
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">작품 관리</div>
+      <div class="nav-item" onclick="showPanel('completed')">
+        <span class="nav-icon">✅</span> 제작 완료
+        <span class="nav-badge" id="nb-done">0</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('planned')">
+        <span class="nav-icon">📋</span> 제작 계획
+        <span class="nav-badge" id="nb-plan">0</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">도료 관리</div>
+      <div class="nav-item" onclick="showPanel('paints')">
+        <span class="nav-icon">🎨</span> 도료 목록
+        <span class="nav-badge" id="nb-paint">0</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('sets')">
+        <span class="nav-icon">📦</span> 도료 세트
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">장비 관리</div>
+      <div class="nav-item" onclick="showPanel('tools')">
+        <span class="nav-icon">🔧</span> 공구 & 장비
+        <span class="nav-badge" id="nb-tools">0</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('figures')">
+        <span class="nav-icon">🎖️</span> 피규어
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-label">도색 가이드</div>
+      <div class="nav-item" onclick="showPanel('colorguide')">
+        <span class="nav-icon">🗺️</span> 색상 가이드
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="section-header">
+        <div class="section-title">현황 요약 <span>OVERVIEW</span></div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-block">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-info">
+            <div class="stat-num" id="st-done">0</div>
+            <div class="stat-label">제작 완료</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <div class="stat-num" id="st-plan">0</div>
+            <div class="stat-label">제작 계획</div>
+          </div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-icon">🎨</div>
+          <div class="stat-info">
+            <div class="stat-num" id="st-paint">0</div>
+            <div class="stat-label">보유 도료 종류</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+        <div class="card card-a">
+          <div class="card-label">장르 분포</div>
+          <div id="genre-dist"></div>
+        </div>
+        <div class="card card-b">
+          <div class="card-label">국가별 제작 완료</div>
+          <div id="nation-dist"></div>
+        </div>
+      </div>
+
+      <div class="card card-d">
+        <div class="card-label" style="margin-bottom:12px;">최근 등록된 제작 완료 작품</div>
+        <div id="recent-completed"></div>
+      </div>
+    </div>
+
+    <!-- COMPLETED -->
+    <div class="panel" id="panel-completed">
+      <div class="section-header">
+        <div class="section-title">제작 완료 <span id="ct-done-count"></span></div>
+        <button class="btn" onclick="openModal('add-model','completed')">+ 새 작품 등록</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="키트명, 제조사, 국가 검색..." id="search-completed" oninput="renderCompleted()">
+        <select class="filter" id="filter-genre-c" onchange="renderCompleted()">
+          <option value="">전체 장르</option>
+          <option>AFV</option><option>AUTO</option><option>AERO</option><option>SHIP</option><option>BIKE</option>
+        </select>
+        <select class="filter" id="filter-nation-c" onchange="renderCompleted()">
+          <option value="">전체 국가</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>품명</th>
+              <th>장르</th>
+              <th>국가</th>
+              <th>제조사</th>
+              <th>크기</th>
+              <th>구매일</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-completed"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PLANNED -->
+    <div class="panel" id="panel-planned">
+      <div class="section-header">
+        <div class="section-title">제작 계획 <span id="ct-plan-count"></span></div>
+        <button class="btn" onclick="openModal('add-model','planned')">+ 계획 추가</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="키트명, 제조사, 국가 검색..." id="search-planned" oninput="renderPlanned()">
+        <select class="filter" id="filter-genre-p" onchange="renderPlanned()">
+          <option value="">전체 장르</option>
+          <option>AFV</option><option>AUTO</option><option>AERO</option><option>SHIP</option><option>BIKE</option>
+        </select>
+        <select class="filter" id="filter-nation-p" onchange="renderPlanned()">
+          <option value="">전체 국가</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>우선</th>
+              <th>품명</th>
+              <th>장르</th>
+              <th>국가</th>
+              <th>크기</th>
+              <th>난이도</th>
+              <th>제조사</th>
+              <th>피규어</th>
+              <th>위치</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-planned"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAINTS -->
+    <div class="panel" id="panel-paints">
+      <div class="section-header">
+        <div class="section-title">보유 도료 <span id="ct-paint-count"></span></div>
+        <button class="btn" onclick="openModal('add-paint')">+ 도료 등록</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="색상명, 코드 검색..." id="search-paint" oninput="renderPaints()">
+        <select class="filter" id="filter-brand" onchange="renderPaints()">
+          <option value="">전체 브랜드</option>
+          <option>Tamiya 에나멜</option><option>Vallejo</option><option>MIG</option><option>AK</option><option>군제 Hobby Color</option><option>아카데미 에나멜</option><option>Italeri</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>브랜드</th>
+              <th>코드/색상명</th>
+              <th>유사색 (타미야)</th>
+              <th>유사색 (Vallejo)</th>
+              <th>비고</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-paints"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SETS -->
+    <div class="panel" id="panel-sets">
+      <div class="section-header">
+        <div class="section-title">도료 세트 <span>BY NATION</span></div>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="세트명, 색상명 검색..." id="search-sets" oninput="renderSets()">
+        <select class="filter" id="filter-set-nation" onchange="renderSets()">
+          <option value="">전체 국가</option>
+        </select>
+        <select class="filter" id="filter-set-company" onchange="renderSets()">
+          <option value="">전체 회사</option>
+          <option>MIG</option><option>AK Interactive</option><option>Vallejo</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>국가</th>
+              <th>세트명</th>
+              <th>회사</th>
+              <th>색상명</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-sets"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TOOLS -->
+    <div class="panel" id="panel-tools">
+      <div class="section-header">
+        <div class="section-title">공구 & 장비 <span id="ct-tools-count"></span></div>
+        <button class="btn" onclick="openModal('add-tool')">+ 장비 등록</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="품명 검색..." id="search-tools" oninput="renderTools()">
+        <select class="filter" id="filter-toolcat" onchange="renderTools()">
+          <option value="">전체 분류</option>
+          <option>조립 도구</option><option>도색도구</option><option>기타</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>대분류</th>
+              <th>종류</th>
+              <th>품명</th>
+              <th>비고</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-tools"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FIGURES -->
+    <div class="panel" id="panel-figures">
+      <div class="section-header">
+        <div class="section-title">피규어 목록 <span>FIGURES</span></div>
+        <button class="btn" onclick="openModal('add-figure')">+ 피규어 등록</button>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="피규어명, 적용 키트 검색..." id="search-figures" oninput="renderFigures()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>세트명</th>
+              <th>구분</th>
+              <th>적용 키트</th>
+              <th>비고</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-figures"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COLOR GUIDE -->
+    <div class="panel" id="panel-colorguide">
+      <div class="section-header">
+        <div class="section-title">도색 가이드 <span>COLOR GUIDE</span></div>
+      </div>
+      <div class="notice">⚠️ 도색 가이드는 기존 엑셀 데이터에서 불러온 색상 대조표입니다. 각 키트의 지정색과 유사색 정보를 제공합니다.</div>
+      <div class="toolbar">
+        <input class="search-box" type="text" placeholder="모형명, 색상명 검색..." id="search-cg" oninput="renderColorGuide()">
+        <select class="filter" id="filter-cg-category" onchange="renderColorGuide()">
+          <option value="">전체 카테고리</option>
+          <option>AFV현용-국군</option><option>AFV현용-미군</option><option>AFV현용-IDF</option><option>AFV현용-러시아</option><option>AFV현용-기타</option>
+          <option>WWII독일</option><option>AUTO</option><option>BIKE</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>카테고리</th>
+              <th>모형명</th>
+              <th>색상명</th>
+              <th>타미야</th>
+              <th>Vallejo</th>
+              <th>MIG/AK</th>
+              <th>확보</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-cg"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: Add Model -->
+<div class="modal-overlay" id="modal-add-model">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-model-title">작품 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-add-model')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">품명 *</label>
+          <input type="text" class="form-input" id="m-name" placeholder="예: 1/35 타이거-I 초기형">
+        </div>
+        <div class="form-group">
+          <label class="form-label">장르 *</label>
+          <select class="form-select" id="m-genre">
+            <option>AFV</option><option>AUTO</option><option>AERO</option><option>SHIP</option><option>BIKE</option><option>ETC</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">장르 상세</label>
+          <input type="text" class="form-input" id="m-genre-detail" placeholder="예: 2차대전 중전차">
+        </div>
+        <div class="form-group">
+          <label class="form-label">운용국</label>
+          <input type="text" class="form-input" id="m-nation" placeholder="예: 독일">
+        </div>
+        <div class="form-group">
+          <label class="form-label">크기</label>
+          <select class="form-select" id="m-size">
+            <option value="">-</option><option>소</option><option>중</option><option>대</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">제조사</label>
+          <input type="text" class="form-input" id="m-maker" placeholder="예: ACADEMY">
+        </div>
+        <div class="form-group">
+          <label class="form-label">난이도</label>
+          <input type="number" class="form-input" id="m-diff" placeholder="예: 15">
+        </div>
+        <div class="form-group">
+          <label class="form-label">구매일</label>
+          <input type="text" class="form-input" id="m-date" placeholder="예: 2024.03.20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">위치</label>
+          <select class="form-select" id="m-location">
+            <option value="">-</option><option>집</option><option>본가</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">우선순위</label>
+          <input type="number" class="form-input" id="m-priority" placeholder="숫자 낮을수록 높음">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">선택 타입 / 비고</label>
+          <textarea class="form-textarea" id="m-note" placeholder="선택한 타입, 도색 방향, 기타 메모..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">피규어 선택</label>
+          <input type="text" class="form-input" id="m-figure" placeholder="동봉, 별매, X 등">
+        </div>
+        <div class="form-group">
+          <label class="form-label">피규어 확보 여부</label>
+          <select class="form-select" id="m-figure-ok">
+            <option value="">-</option><option>O</option><option>X</option><option>△</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">조립 후 도색 가능</label>
+          <select class="form-select" id="m-paint-ok">
+            <option value="">-</option><option>O</option><option>X</option><option>△</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">완료 여부 (완료 작품 등록 시)</label>
+          <select class="form-select" id="m-completed">
+            <option value="false">제작 계획</option><option value="true">제작 완료</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" onclick="closeModal('modal-add-model')">취소</button>
+      <button class="btn" onclick="saveModel()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Paint -->
+<div class="modal-overlay" id="modal-add-paint">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">도료 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-add-paint')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">브랜드 *</label>
+          <select class="form-select" id="p-brand">
+            <option>Tamiya 에나멜</option>
+            <option>Vallejo Model Color</option>
+            <option>MIG</option>
+            <option>AK Interactive</option>
+            <option>군제 Hobby Color</option>
+            <option>아카데미 에나멜</option>
+            <option>Italeri</option>
+            <option>Life Color</option>
+            <option>ATOM</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">코드/색상명 *</label>
+          <input type="text" class="form-input" id="p-code" placeholder="예: XF-1 Flat Black">
+        </div>
+        <div class="form-group">
+          <label class="form-label">타미야 유사색</label>
+          <input type="text" class="form-input" id="p-tamiya" placeholder="예: XF-1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vallejo 유사색</label>
+          <input type="text" class="form-input" id="p-vallejo" placeholder="예: 70950">
+        </div>
+        <div class="form-group">
+          <label class="form-label">군제 유사색</label>
+          <input type="text" class="form-input" id="p-gunze" placeholder="예: H12">
+        </div>
+        <div class="form-group">
+          <label class="form-label">MIG/AK 유사색</label>
+          <input type="text" class="form-input" id="p-mig" placeholder="예: MIG085">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">비고 (구매일, 메모 등)</label>
+          <textarea class="form-textarea" id="p-note" placeholder="구매일, 사용 용도 등..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" onclick="closeModal('modal-add-paint')">취소</button>
+      <button class="btn" onclick="savePaint()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Tool -->
+<div class="modal-overlay" id="modal-add-tool">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">장비 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-add-tool')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">대분류 *</label>
+          <select class="form-select" id="t-cat">
+            <option>조립 도구</option><option>도색도구</option><option>기타</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">종류</label>
+          <input type="text" class="form-input" id="t-type" placeholder="예: 접착제, 사포, 브러쉬">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">품명 *</label>
+          <input type="text" class="form-input" id="t-name" placeholder="예: Tamiya Extra Thin Cement">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">비고 (구매일, 가격 등)</label>
+          <textarea class="form-textarea" id="t-note" placeholder="구매일, 구매처, 가격..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" onclick="closeModal('modal-add-tool')">취소</button>
+      <button class="btn" onclick="saveTool()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add Figure -->
+<div class="modal-overlay" id="modal-add-figure">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">피규어 등록</div>
+      <button class="modal-close" onclick="closeModal('modal-add-figure')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">세트명 *</label>
+          <input type="text" class="form-input" id="f-set" placeholder="예: 영국 셔먼 전차병 4set">
+        </div>
+        <div class="form-group">
+          <label class="form-label">구분</label>
+          <input type="text" class="form-input" id="f-type" placeholder="예: 전차장, 조종수 반신">
+        </div>
+        <div class="form-group">
+          <label class="form-label">적용 키트</label>
+          <input type="text" class="form-input" id="f-kit" placeholder="예: 셔먼 Firefly">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">비고</label>
+          <textarea class="form-textarea" id="f-note" placeholder="메모..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" onclick="closeModal('modal-add-figure')">취소</button>
+      <button class="btn" onclick="saveFigure()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== DATA ==========
+let DATA = {
+  completed: [],
+  planned: [],
+  paints: [],
+  tools: [],
+  figures: [],
+  colorGuide: [],
+  paintSets: []
+};
+
+// ======= PRE-LOADED DATA FROM EXCEL ==========
+
+// COMPLETED MODELS (from 제작완료 sheet)
+DATA.completed = [
+  {id:1, name:"Panzer Kampfwagen II Aust. G", genre:"AFV", detail:"2차대전 경전차", nation:"독일", size:"소", maker:"TAMIYA", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:2, name:"Pz.Kpfw. 35(t)", genre:"AFV", detail:"2차대전 경전차", nation:"독일", size:"소", maker:"ACADEMY", diff:"10", date:"2022.05.25", note:"", figure:"동봉", location:""},
+  {id:3, name:"Volkswagen 1300 Beetle 1966", genre:"AUTO", detail:"classic 승용 소형", nation:"독일", size:"소", maker:"TAMIYA", diff:"17", date:"2016.07.28", note:"", figure:"X", location:""},
+  {id:4, name:"1/35 Panzer 3 Aust.J \"North Africa\"", genre:"AFV", detail:"2차대전 중형전차", nation:"독일", size:"중", maker:"ACADEMY", diff:"23", date:"2022.05.25", note:"type 5 1942 Libya 하얀넘버링", figure:"", location:""},
+  {id:5, name:"MENG 1/35 German Pkw.K1 Kübelwagen Type 82", genre:"AFV", detail:"2차대전 소형전술차량", nation:"독일", size:"소", maker:"MENG", diff:"22", date:"2024.11.16", note:"type c 10th Panzer Division, 사막 brown 위장", figure:"O", location:""},
+  {id:6, name:"폭스바겐 마이크로버스 (VW Type 2)", genre:"AUTO", detail:"classic 미니버스", nation:"독일", size:"대", maker:"Hasegawa", diff:"9", date:"2022.07.31", note:"", figure:"X", location:""},
+  {id:7, name:"1/35 KV-1 1942 Simplified Turret Tank", genre:"AFV", detail:"2차대전 중전차", nation:"러시아", size:"대", maker:"TRUMPETER", diff:"18", date:"2023.12.07", note:"C type, 인형7 서비스", figure:"동봉", location:""},
+  {id:8, name:"1/35 ISU-152", genre:"AFV", detail:"2차대전 대전차자주포", nation:"러시아", size:"중", maker:"Zvezda", diff:"6", date:"2023.05.04", note:"단일타입", figure:"", location:""},
+  {id:9, name:"1/35 ERC-90F1 LYNX", genre:"AFV", detail:"현용 6륜 차륜형 장갑차", nation:"멕시코", size:"중", maker:"TIGER MODEL", diff:"49", date:"2024.06.01", note:"멕시코군 B 위장", figure:"", location:""},
+  {id:10, name:"M3A1 Stuart", genre:"AFV", detail:"2차대전 경전차", nation:"미국", size:"소", maker:"ACADEMY", diff:"8", date:"2003.04.30", note:"", figure:"", location:""},
+  {id:11, name:"M4A1 Sherman", genre:"AFV", detail:"2차대전 중형전차", nation:"미국", size:"중", maker:"ITALERI", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:12, name:"M-12 155mm GUN MOTOR CARRIAGE", genre:"AFV", detail:"2차대전 자주곡사포", nation:"미국", size:"중", maker:"ACADEMY", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:13, name:"1/35 GMC Bofors 40mm Gun", genre:"AFV", detail:"2차대전 차량", nation:"미국", size:"소", maker:"HobbyBoss", diff:"10", date:"2022.12.14", note:"자유프랑스군 단일 타입", figure:"입수불가", location:""},
+  {id:14, name:"1/35 JLTV M1278A1", genre:"AFV", detail:"현용 소형전술기동차량", nation:"미국", size:"소", maker:"RYEFIELD", diff:"30", date:"2023.11.13", note:"US Army 버전", figure:"", location:""},
+  {id:15, name:"1/35 M7 Priest", genre:"AFV", detail:"2차대전 자주곡사포", nation:"영국", size:"소", maker:"ACADEMY", diff:"12", date:"2023.06.19", note:"3번 1942 영국군 엘 알라메인", figure:"", location:""},
+  {id:16, name:"1/35 미육군 M8 그레이하운드 6륜 장갑차", genre:"AFV", detail:"2차대전 경장갑차", nation:"미국", size:"중", maker:"ITALERI", diff:"14", date:"2023.03.21", note:"인형때문에 버전1 44년 미육군형", figure:"ali WWII U.S.Army M8 Crew", location:""},
+  {id:17, name:"Ford GT40 1968 Le Mans", genre:"AUTO", detail:"classic 레이싱", nation:"미국", size:"중", maker:"FUJIMI", diff:"12", date:"2022.04.08", note:"", figure:"X", location:""},
+  {id:18, name:"British Universal Carrier Mk II", genre:"AFV", detail:"2차대전 경장갑차", nation:"영국", size:"소", maker:"TAMIYA", diff:"", date:"2010.03.10 이전", note:"", figure:"동봉", location:""},
+  {id:19, name:"Rover mini cooper 1.3i", genre:"AUTO", detail:"classic 승용 소형", nation:"영국", size:"소", maker:"FUJIMI", diff:"12", date:"2018.12.30", note:"", figure:"X", location:""},
+  {id:20, name:"Valentine Mk.II", genre:"AFV", detail:"2차대전 보병전차", nation:"영국", size:"중", maker:"AFVCLUB", diff:"36", date:"2015.03.30", note:"", figure:"", location:""},
+  {id:21, name:"1:35 WWII British Humber Mk.I Scout Car", genre:"AFV", detail:"2차대전 정찰장갑차량", nation:"영국", size:"소", maker:"Bronco", diff:"15", date:"2024.03.20", note:"type 3 1945 Germany", figure:"동봉", location:""},
+  {id:22, name:"1/35 WWII British SAS Jeep", genre:"AFV", detail:"2차대전 소형전술차량", nation:"영국", size:"소", maker:"TAMIYA", diff:"10", date:"2024.04.02", note:"설명서상은 단색", figure:"동봉", location:""},
+  {id:23, name:"1/35 British Medium Tank Mk.A Whippet", genre:"AFV", detail:"1차대전 경전차", nation:"영국", size:"소", maker:"MENG", diff:"16", date:"2023.11.13", note:"B Type 데칼", figure:"", location:""},
+  {id:24, name:"1/35 Dingo Mk.Ib British scout", genre:"AFV", detail:"2차대전 정찰장갑차량", nation:"영국", size:"소", maker:"MiniArt", diff:"43", date:"2024.08.08", note:"type 1 1942 Libya 2톤 위장", figure:"동봉", location:""},
+  {id:25, name:"1/35 WARRIOR MCV IRAQ 2003", genre:"AFV", detail:"현용 보병전투차", nation:"영국", size:"중", maker:"ACADEMY", diff:"18", date:"2023.06.19", note:"1번 영육군 2003 이라크 사막단색", figure:"", location:""},
+  {id:26, name:"M113 Fitter", genre:"AFV", detail:"현용 장갑차", nation:"이스라엘", size:"소", maker:"ACADEMY", diff:"22", date:"2003.04.30", note:"", figure:"", location:""},
+  {id:27, name:"1/35 IDF AMX-13/75", genre:"AFV", detail:"현용 경전차", nation:"이스라엘", size:"소", maker:"TAKOM", diff:"27", date:"2023.03.29", note:"1967 nablus형, 식별띠가 인상적", figure:"", location:""},
+  {id:28, name:"1/35 Merkava Mk.2D", genre:"AFV", detail:"현용 2세대 MBT", nation:"이스라엘", size:"대", maker:"TAKOM", diff:"29", date:"2024.06.01", note:"4번타입 바스켓 색상데칼", figure:"Meng IDF Tank crew", location:""},
+  {id:29, name:"Lamborghini Murcielago LP 670-4 SV", genre:"AUTO", detail:"슈퍼카", nation:"이탈리아", size:"중", maker:"ACADEMY", diff:"", date:"2019.12.26", note:"", figure:"X", location:""},
+  {id:30, name:"Carro Armato L6 40", genre:"AFV", detail:"2차대전 경전차", nation:"이탈리아", size:"소", maker:"ITALERI", diff:"9", date:"2016.07.28", note:"", figure:"", location:""},
+  {id:31, name:"ferrari 330p4", genre:"AUTO", detail:"classic 레이싱", nation:"이탈리아", size:"중", maker:"FUJIMI", diff:"13", date:"2022.06.07", note:"", figure:"X", location:""},
+  {id:32, name:"Camionetta AS 42 Sahariana", genre:"AFV", detail:"2차대전 차량", nation:"이탈리아", size:"소", maker:"ITALERI", diff:"25", date:"2016.07.28", note:"", figure:"동봉", location:""},
+  {id:33, name:"1/24 Lancia Super Delta (1992 WRC)", genre:"AUTO", detail:"랠리카", nation:"이탈리아", size:"중", maker:"Hasegawa", diff:"15", date:"2024.03.22", note:"", figure:"X", location:""},
+  {id:34, name:"1/35 Carro Armato L35/c 20mm anti-tank gun", genre:"AFV", detail:"2차대전 경전차", nation:"이탈리아", size:"소", maker:"Bronco", diff:"17", date:"2023.12.07", note:"1941 북아프리카 바르디아 타입", figure:"", location:""},
+  {id:35, name:"Honda NSR500", genre:"BIKE", detail:"레이싱", nation:"일본", size:"중", maker:"Hasegawa", diff:"22", date:"2015.03.30", note:"", figure:"X", location:""},
+  {id:36, name:"type97 (CHI-HA)", genre:"AFV", detail:"2차대전 중형전차", nation:"일본", size:"중", maker:"TAMIYA", diff:"9", date:"2022.08.24", note:"", figure:"동봉", location:""},
+  {id:37, name:"1/24 Suzuki Hustler", genre:"AUTO", detail:"경형 SUV", nation:"일본", size:"소", maker:"FUJIMI", diff:"14", date:"2024.10.20", note:"", figure:"X", location:""},
+  {id:38, name:"NISSAN CEDRIC TEXI", genre:"AUTO", detail:"승용 준대형 세단", nation:"일본", size:"중", maker:"FUJIMI", diff:"17", date:"2019.04.12", note:"", figure:"X", location:""},
+  {id:39, name:"1/35 Jagdpanzer 38(t) Hetzer Prague 1945", genre:"AFV", detail:"2차대전 시민군 장갑차량", nation:"체코", size:"소", maker:"ACADEMY", diff:"13", date:"2025.03.16", note:"1번 타입 UV217호", figure:"", location:""},
+  {id:40, name:"1/35 Croatian T-55A", genre:"AFV", detail:"현용 1세대 MBT", nation:"크로아티아", size:"대", maker:"MiniArt", diff:"81", date:"2023.03.30", note:"1번 1990s 크로아티아", figure:"입수불가", location:""},
+  {id:41, name:"7TP", genre:"AFV", detail:"2차대전 경전차", nation:"폴란드", size:"소", maker:"MIRAGE", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:42, name:"SOMUA S35", genre:"AFV", detail:"2차대전 기병전차", nation:"프랑스", size:"소", maker:"HELLER", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:43, name:"M48A5K", genre:"AFV", detail:"현용 1세대 MBT", nation:"한국", size:"대", maker:"ACADEMY", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:44, name:"K200", genre:"AFV", detail:"현용 장갑차", nation:"한국", size:"소", maker:"ACADEMY", diff:"", date:"2010.03.10 이전", note:"", figure:"", location:""},
+  {id:45, name:"현대 SANTA FE", genre:"AUTO", detail:"중형 SUV", nation:"한국", size:"중", maker:"ACADEMY", diff:"", date:"2020.11.16", note:"", figure:"X", location:""},
+  {id:46, name:"현대 그랜저 HG", genre:"AUTO", detail:"준대형 세단", nation:"한국", size:"중", maker:"ACADEMY", diff:"", date:"2020.11.16", note:"", figure:"X", location:""},
+  {id:47, name:"기아마스타 삼륜차 T600", genre:"AUTO", detail:"classic 삼륜화물차", nation:"한국", size:"소", maker:"ACADEMY", diff:"", date:"2020.11.20", note:"", figure:"X", location:""},
+  {id:48, name:"현대 포니", genre:"AUTO", detail:"classic 소형 세단", nation:"한국", size:"소", maker:"ACADEMY", diff:"", date:"2020.11.21", note:"", figure:"동봉", location:""},
+  {id:49, name:"포터II 내장탑차 이마트 SSG 에디션", genre:"AUTO", detail:"소형 픽업트럭", nation:"한국", size:"대", maker:"ACADEMY", diff:"", date:"2025.04.21", note:"", figure:"", location:""},
+  {id:50, name:"1/35 IDF M3 Half-track Six-Day War 50th Anni.", genre:"AFV", detail:"하프트랙 병력수송장갑차", nation:"이스라엘", size:"중", maker:"DRAGON", diff:"22", date:"2024.10.20", note:"type 4", figure:"", location:""},
+  {id:51, name:"1/35 Pz.Kpfw.IV Ausf. G", genre:"AFV", detail:"2차대전 중형전차", nation:"독일", size:"중", maker:"RYEFIELD", diff:"21", date:"2024.06.01", note:"401호차 Kharkov 동계위장", figure:"MiniArt German Tank Crew Winter", location:""},
+  {id:52, name:"1/35 IDF NAGMACHON 중장갑차 전기형", genre:"AFV", detail:"현용 장갑차", nation:"이스라엘", size:"대", maker:"TIGER MODEL", diff:"38", date:"2023.03.21", note:"IDF 남레바논 1999년형", figure:"Meng IDF Tank crew?", location:""},
+  {id:53, name:"Jaguar E-Type Coupe", genre:"AUTO", detail:"classic 스포츠카", nation:"영국", size:"중", maker:"revell", diff:"66", date:"2022.06.06", note:"", figure:"X", location:""},
+  {id:54, name:"Panzer I Ausf.A", genre:"AFV", detail:"2차대전 경전차", nation:"독일", size:"소", maker:"Tristar", diff:"13", date:"2022.03.22", note:"2 노르웨이 1940 또는 3 Polish 캠페인", figure:"", location:""},
+  {id:55, name:"Soviet Light Tank BT-7", genre:"AFV", detail:"2차대전 경전차", nation:"러시아", size:"소", maker:"Zvezda", diff:"23", date:"2022.06.07", note:"Dark green/brown 위장", figure:"KV-1 잔여피규어", location:""},
+  {id:56, name:"1/35 Pz.kpfw.II Luchs Ausf.L", genre:"AFV", detail:"2차대전 경전차", nation:"독일", size:"소", maker:"ASUKA", diff:"20", date:"2024.02.17", note:"Type 6 그룹리더마킹", figure:"", location:""},
+  {id:57, name:"Hotchkiss H-38/39(H)", genre:"AFV", detail:"2차대전 경기병전차", nation:"프랑스", size:"소", maker:"TRUMPETER", diff:"17", date:"2022.08.24", note:"도색 데칼 단일", figure:"MiniArt French Tank Crew", location:""},
+  {id:58, name:"Ducati 888 Superbike", genre:"BIKE", detail:"레이싱", nation:"이탈리아", size:"중", maker:"TAMIYA", diff:"15", date:"2022.08.24", note:"", figure:"X", location:""},
+  {id:59, name:"German Leichter Panzerspahwagen Sd.Kfz.222", genre:"AFV", detail:"2차대전 정찰장갑차량", nation:"독일", size:"소", maker:"Tristar", diff:"16", date:"2024.09.11", note:"2번 20 panzer Division 1943 grey+yellow", figure:"Dragon German Tank Crew", location:""},
+  {id:60, name:"1/35 Soviet T-70B Light Tank", genre:"AFV", detail:"2차대전 경전차", nation:"러시아", size:"소", maker:"Zvezda", diff:"6", date:"2023.11.09", note:"2번 우크라이나", figure:"", location:""},
+  {id:61, name:"1/35 R.O.K. Army K311A1", genre:"AFV", detail:"현용 경트럭", nation:"한국", size:"소", maker:"ACADEMY", diff:"25", date:"2023.11.09", note:"버전4 국군 2020 3색 위장", figure:"동봉", location:""},
+  {id:62, name:"1/24 싼타페 MX5 MCP", genre:"AUTO", detail:"중형 SUV", nation:"한국", size:"중", maker:"ACADEMY", diff:"", date:"2025.09.29", note:"", figure:"", location:""},
+  {id:63, name:"1/35 Russian T-72B1 with KMT-6", genre:"AFV", detail:"현용 2세대 MBT", nation:"러시아", size:"대", maker:"Trumpeter", diff:"49", date:"2024.08.23", note:"단일색상, 단일타입", figure:"", location:""},
+  {id:64, name:"1/35 US M76 Amphibious Cargo Carrier OTTER", genre:"AFV", detail:"2차대전/현용 수륙양용 수송 장갑차", nation:"미국", size:"소", maker:"Gecko Models", diff:"47", date:"2025.08.18", note:"USMC Conk Killer 1968 단색", figure:"", location:""},
+  {id:65, name:"1/35 BA-64B Light armored car soviet", genre:"AFV", detail:"2차대전 정찰장갑차", nation:"러시아", size:"소", maker:"Lanmo", diff:"14", date:"2025.08.18", note:"1943 winter 단색", figure:"", location:""},
+  {id:66, name:"IJN Type 1 Gun Tank Ho-Ni w/6 Figures", genre:"AFV", detail:"2차대전 대전차자주포", nation:"일본", size:"소", maker:"TAMIYA", diff:"11", date:"2022.04.04", note:"2번째 타입, 4색위장", figure:"동봉", location:""},
+  {id:67, name:"Israeli M-51 Super Sherman", genre:"AFV", detail:"현용 3,4차 중동전", nation:"이스라엘", size:"중", maker:"ACADEMY", diff:"9", date:"2022.11.01", note:"도색 데칼 단일", figure:"동봉", location:""},
+  {id:68, name:"1/35 Utility Vehicle EAGLE IV", genre:"AFV", detail:"현용 소형전술차량", nation:"독일", size:"소", maker:"VESPID", diff:"17", date:"2024.06.01", note:"실전느낌 3번 아프가니스탄", figure:"", location:"집"},
+  {id:69, name:"1/35 MB Military Vehicle", genre:"AFV", detail:"2차대전 소형전술차량", nation:"미국", size:"소", maker:"MENG", diff:"22", date:"2024.06.01", note:"A타입", figure:"Bronco US Truck Crew Set", location:"집"},
+  {id:70, name:"1/35 Sd.Kfz.251/17 Ausf.C Luftwaffe Version", genre:"AFV", detail:"2차대전 반궤도장갑차", nation:"독일", size:"중", maker:"AFV CLUB", diff:"34", date:"2024.03.21", note:"Type A 사막위장 1943 Sicily", figure:"Ali DAK 2cm Flak 38", location:"집"},
+  {id:71, name:"1/35 M18 HELLCAT", genre:"AFV", detail:"2차대전 대전차자주포", nation:"미국", size:"중", maker:"ACADEMY", diff:"25", date:"2023.06.19", note:"Type 1 1944 프랑스", figure:"ali M18 3 set", location:"집"},
+  {id:72, name:"1/35 M1A2 SEP V3", genre:"AFV", detail:"현용 3.5세대 MBT", nation:"미국", size:"대", maker:"RYEFIELD", diff:"18", date:"2024.06.01", note:"타입3 3rd brigade Combat team 1st cavalry", figure:"", location:"본가"},
+  {id:73, name:"1/35 StuH 42 & StuG III Ausf. G Late 2 IN 1", genre:"AFV", detail:"2차대전 돌격포", nation:"독일", size:"중", maker:"TAKOM", diff:"29", date:"2025.11.11", note:"", figure:"", location:""},
+  {id:74, name:"1/35 U.S. Howitzer Motor Carriage M8", genre:"AFV", detail:"2차대전 자주곡사포", nation:"미국", size:"소", maker:"TAMIYA", diff:"13", date:"2023.12.07", note:"2번 타입 유럽전선", figure:"동봉", location:"본가"},
+  {id:75, name:"1/35 U.S.ARMY M1126 STRYKER", genre:"AFV", detail:"현용 차륜형장갑차", nation:"미국", size:"중", maker:"AFV CLUB", diff:"21", date:"2022.12.22", note:"1 미육군 2008 주한미군형", figure:"Trumpeter Modern U.S. Army", location:"집"},
+];
+
+// PLANNED MODELS
+DATA.planned = [
+  {id:1, name:"1/35 French Panhard VBL 12.7mm M2 Machine Gun", genre:"AFV", detail:"현용 소형전술차량", nation:"프랑스", size:"소", maker:"TIGER MODEL", diff:"17", date:"2024.11.05", priority:1, note:"단일 타입, NATO 3색과 사막 2색", figure:"Modern French Army ali", figureOk:"O", paintOk:"X", location:"집"},
+  {id:2, name:"1/35 IDF SHOT KAL \"Alef\"", genre:"AFV", detail:"현용 1세대 MBT", nation:"이스라엘", size:"대", maker:"Amusing", diff:"25", date:"2023.07.17", priority:2, note:"단일타입", figure:"IDF centurion mk.5 (six day) crew-2", figureOk:"O", paintOk:"O", location:"본가"},
+  {id:3, name:"1/35 German RSO/3 mit 2cm Flakvierling", genre:"AFV", detail:"2차대전 궤도형 트랙터", nation:"독일", size:"소", maker:"DRAGON", diff:"19", date:"2025.08.18", priority:8, note:"단일타입, 3색 위장", figure:"4개 동봉", figureOk:"O", paintOk:"", location:"집"},
+  {id:4, name:"1/35 독일 4호 돌격전차 브롬베어 중기생산형", genre:"AFV", detail:"2차대전 돌격전차", nation:"독일", size:"중", maker:"ACADEMY", diff:"27", date:"2023.02.20", priority:9, note:"type3 1944 노르망디", figure:"", figureOk:"X", paintOk:"O", location:"집"},
+  {id:5, name:"LOTUS SUPER7 SERIES 2", genre:"AUTO", detail:"classic 포뮬러카", nation:"영국", size:"소", maker:"TAMIYA", diff:"13", date:"2022.01.31", priority:10, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:6, name:"1/35 USMC LAV-25 \"PIRANHA\"", genre:"AFV", detail:"현용 차륜형보병전투차", nation:"미국", size:"중", maker:"TRUMPETER", diff:"15", date:"2022.12.14", priority:11, note:"USMC 3색 위장", figure:"", figureOk:"X", paintOk:"O", location:"본가"},
+  {id:7, name:"1/35 PANTHER Ausf.G late production (Blitz)", genre:"AFV", detail:"2차대전 중형전차", nation:"독일", size:"대", maker:"TAKOM/Daswerk", diff:"15", date:"2025.03.19", priority:15, note:"4번 Berlin Germany May 1945", figure:"", figureOk:"X", paintOk:"O", location:"본가"},
+  {id:8, name:"1/35 IDF M113 Armored Personnel Carrier 1973", genre:"AFV", detail:"현용 병력수송장갑차", nation:"이스라엘", size:"소", maker:"DRAGON", diff:"13", date:"2024.03.20", priority:18, note:"차량과 무관한 정찰병 피규어 4동봉", figure:"M113 crew and infantry-3", figureOk:"O", paintOk:"X", location:"본가"},
+  {id:9, name:"Nissan R390 GT1", genre:"AUTO", detail:"경주용", nation:"일본", size:"중", maker:"TAMIYA", diff:"18", date:"2018.12.30", priority:20, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:10, name:"1/35 FT-17 프랑스군 경전차 리벳 포탑", genre:"AFV", detail:"1차대전 경전차", nation:"중국", size:"소", maker:"MENG", diff:"22", date:"2023.03.21", priority:20, note:"B타입 1929년 중국혁명군", figure:"", figureOk:"X", paintOk:"X", location:"집"},
+  {id:11, name:"New Fiat 500", genre:"AUTO", detail:"승용 소형 해치백", nation:"이탈리아", size:"소", maker:"FUJIMI", diff:"16", date:"2020.01.19", priority:25, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:12, name:"1/35 M966 TOW Missile Carrier", genre:"AFV", detail:"현용 소형전술차량", nation:"미국", size:"소", maker:"ACADEMY", diff:"16", date:"2024.02.17", priority:26, note:"표준3색미채 단일", figure:"동봉", figureOk:"O", paintOk:"X", location:"본가"},
+  {id:13, name:"1/35 M114 A1E1 CRV", genre:"AFV", detail:"현용 병력수송장갑차", nation:"미국", size:"소", maker:"TAKOM", diff:"22", date:"2023.05.02", priority:27, note:"모두 독일주둔 미군버전", figure:"", figureOk:"X", paintOk:"X", location:"집"},
+  {id:14, name:"1/35 M1151 증가장갑형 고기동차량", genre:"AFV", detail:"현용 소형전술차량", nation:"미국", size:"소", maker:"ACADEMY", diff:"20", date:"2022.12.22", priority:28, note:"2번 사막단일색", figure:"동봉", figureOk:"O", paintOk:"X", location:"본가"},
+  {id:15, name:"1/35 Jagdpanzer Marder I Sd.Kfz.135", genre:"AFV", detail:"2차대전 대전차자주포", nation:"독일", size:"소", maker:"TAMIYA", diff:"35", date:"2024.03.20", priority:30, note:"Type1 1944 France 3색 위장 dot 도전", figure:"동봉", figureOk:"O", paintOk:"X", location:"집"},
+  {id:16, name:"1/35 R.O.K Army K511A1 2.5ton Cargo Truck", genre:"AFV", detail:"현용 차량", nation:"한국", size:"중", maker:"AFV CLUB", diff:"18", date:"2022.12.22", priority:31, note:"4색위장 단일타입", figure:"", figureOk:"X", paintOk:"X", location:"집"},
+  {id:17, name:"1/35 U.S. Army M4A3E2 (Cobra King)", genre:"AFV", detail:"2차대전 중형전차", nation:"미국", size:"중", maker:"ASUKA", diff:"21", date:"2024.02.17", priority:33, note:"버전1 1944.12 4기갑사단 37전차대대", figure:"ali M4A3E2 3 set", figureOk:"O", paintOk:"O", location:"본가"},
+  {id:18, name:"1/35 소비에트 연방 M10 랜드리스", genre:"AFV", detail:"2차대전 대전차자주포", nation:"러시아", size:"중", maker:"ACADEMY", diff:"32", date:"2023.02.24", priority:35, note:"단일타입 피규어6포함", figure:"동봉", figureOk:"O", paintOk:"X", location:"집"},
+  {id:19, name:"1/35 IDF 1/4-Ton 4x4 Truck w/MG34", genre:"AFV", detail:"현용 소형전술차량", nation:"이스라엘", size:"소", maker:"DRAGON", diff:"12", date:"2024.10.20", priority:3, note:"설명서 입수불가. 직접 봐야함", figure:"", figureOk:"X", paintOk:"X", location:"본가"},
+  {id:20, name:"1/35 British SHERMAN VC FIREFLY", genre:"AFV", detail:"2차대전 중형전차", nation:"영국", size:"중", maker:"RYEFIELD", diff:"22", date:"2023.07.17", priority:38, note:"첫타입 영국군 3군단 노르망디 1944", figure:"ali firefly 전차병 4 set", figureOk:"O", paintOk:"O", location:"집"},
+  {id:21, name:"1/35 타이거-I 초기형 성채작전", genre:"AFV", detail:"2차대전 중전차", nation:"독일", size:"대", maker:"ACADEMY", diff:"15", date:"2023.02.24", priority:39, note:"2번 다스라이히 쿠르스크 43년7월", figure:"Ali WAFFEN SS Tank Crew 4 set", figureOk:"O", paintOk:"O", location:"집"},
+  {id:22, name:"1/35 U.S. Medium tank M3 LEE", genre:"AFV", detail:"2차대전 중형전차", nation:"미국", size:"중", maker:"ACADEMY", diff:"19", date:"2023.02.24", priority:44, note:"type1 1943.05 튀니스", figure:"", figureOk:"△", paintOk:"△", location:"집"},
+  {id:23, name:"Ferrari 250GTO", genre:"AUTO", detail:"classic 슈퍼카 중형", nation:"이탈리아", size:"중", maker:"FUJIMI", diff:"16", date:"2022.04.08", priority:45, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:24, name:"1/35 M36/M36B2 \"벌지전투\"", genre:"AFV", detail:"2차대전 대전차자주포", nation:"미국", size:"중", maker:"ACADEMY", diff:"32", date:"2023.02.24", priority:45, note:"미군 A형", figure:"", figureOk:"△", paintOk:"X", location:"집"},
+  {id:25, name:"T-34/85 \"Berlin 1945\"", genre:"AFV", detail:"2차대전 중형전차", nation:"러시아", size:"중", maker:"ACADEMY", diff:"19", date:"2020.11.27", priority:46, note:"1번 11전차군단 1945 베를린 타입", figure:"KV-1 잔여피규어", figureOk:"△", paintOk:"O", location:"본가"},
+  {id:26, name:"마가크6c gal batash", genre:"AFV", detail:"현용 2세대 MBT", nation:"이스라엘", size:"대", maker:"ACADEMY", diff:"12", date:"2022.07.31", priority:48, note:"도색 데칼 단일", figure:"Modern Israeli Tank Crew 2 set Ali", figureOk:"O", paintOk:"O", location:"본가"},
+  {id:27, name:"1/35 T-80U Russian Main Battle Tank", genre:"AFV", detail:"현용 2세대 MBT", nation:"러시아", size:"대", maker:"RYEFIELD", diff:"29", date:"2023.11.13", priority:49, note:"한국군 2017형", figure:"러시아형 Ali 피규어", figureOk:"△", paintOk:"O", location:"본가"},
+  {id:28, name:"Porsche 959", genre:"AUTO", detail:"슈퍼카", nation:"독일", size:"중", maker:"ACADEMY", diff:"10", date:"2020.01.21", priority:50, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:29, name:"1/35 Russian T-90 MBT Cast Turret", genre:"AFV", detail:"현용 3세대 MBT", nation:"러시아", size:"대", maker:"TRUMPETER", diff:"21", date:"2022.12.14", priority:50, note:"첫번째 타입", figure:"Zvezda Russian contemporary Tank Crew", figureOk:"△", paintOk:"O", location:"본가"},
+  {id:30, name:"1/35 German Tiger II (Henschel 1944)", genre:"AFV", detail:"2차대전 중전차", nation:"독일", size:"대", maker:"HobbyBoss", diff:"39", date:"2023.12.07", priority:51, note:"Type1 또는 Type 6", figure:"black 제복", figureOk:"X", paintOk:"O", location:"본가"},
+  {id:31, name:"ROK Army K2 Black Panther", genre:"AFV", detail:"현용 3.5세대 MBT", nation:"한국", size:"대", maker:"ACADEMY", diff:"29", date:"2022.10.09", priority:52, note:"도색 데칼 단일", figure:"ROK Army tank crew 3 set", figureOk:"O", paintOk:"O", location:"본가"},
+  {id:32, name:"1/35 M113A1 Vietnam War", genre:"AFV", detail:"현용 병력수송장갑차", nation:"미국", size:"소", maker:"ACADEMY", diff:"23", date:"2024.02.17", priority:53, note:"M113A1 미군. 피규어4 베트남 여성1", figure:"동봉", figureOk:"O", paintOk:"X", location:"본가"},
+  {id:33, name:"Bulgarian Maybach T-IV H", genre:"AFV", detail:"2차대전 중형전차", nation:"불가리아", size:"중", maker:"MiniArt", diff:"75", date:"2023.03.30", priority:54, note:"6번 1945.02 그린계열", figure:"", figureOk:"X", paintOk:"O", location:"집"},
+  {id:34, name:"BMW M635", genre:"AUTO", detail:"대형 럭셔리 쿠페", nation:"독일", size:"중", maker:"ACADEMY", diff:"17", date:"2020.01.21", priority:55, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:35, name:"1/35 Russian K-4386 TYPHOON-VDV", genre:"AFV", detail:"현용 장갑 병력수송차량", nation:"러시아", size:"소", maker:"MENG", diff:"35", date:"2023.11.13", priority:55, note:"B타입 3색위장", figure:"ali제 12인 세트", figureOk:"O", paintOk:"X", location:"본가"},
+  {id:36, name:"1/35 British army HUSKY TSV", genre:"AFV", detail:"현용 소형전술차량", nation:"영국", size:"소", maker:"MENG", diff:"33", date:"2023.11.13", priority:56, note:"단일타입 2010이후사용", figure:"", figureOk:"X", paintOk:"X", location:"본가"},
+  {id:37, name:"1/35 M2A2 Bradley Iraq 2003", genre:"AFV", detail:"현용 보병전투차", nation:"미국", size:"중", maker:"ACADEMY", diff:"13", date:"2024.02.29", priority:57, note:"type 2 2003 이라크 바그다드", figure:"", figureOk:"X", paintOk:"△", location:"본가"},
+  {id:38, name:"1/35 R.O.K. Army BMP-3 IFV", genre:"AFV", detail:"현용 보병전투차", nation:"한국", size:"중", maker:"ACADEMY/TRUMPETER", diff:"20", date:"2023.11.09", priority:58, note:"", figure:"", figureOk:"X", paintOk:"O", location:"본가"},
+  {id:39, name:"AH-64D Block2", genre:"AERO", detail:"공격 헬리콥터", nation:"미국", size:"소", maker:"ACADEMY", diff:"10", date:"2020.11.27", priority:59, note:"", figure:"X", figureOk:"X", paintOk:"△", location:"집"},
+  {id:40, name:"1/35 R.O.K. Marine Corps M47 패튼", genre:"AFV", detail:"현용 1세대 MBT", nation:"한국", size:"대", maker:"ITALERI", diff:"10", date:"2023.03.21", priority:60, note:"도색 데칼 단일", figure:"", figureOk:"△", paintOk:"O", location:"집"},
+  {id:41, name:"Countach LP500S", genre:"AUTO", detail:"classic 승용 중형", nation:"이탈리아", size:"중", maker:"ACADEMY", diff:"12", date:"2022.03.22", priority:62, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:42, name:"F35 Green Knight", genre:"AERO", detail:"현용 전투기", nation:"미국", size:"중", maker:"ACADEMY", diff:"18", date:"2020.11.27", priority:63, note:"", figure:"X", figureOk:"X", paintOk:"△", location:"집"},
+  {id:43, name:"1/35 Jagdpanzer 38(t) Hetzer 최후생산형", genre:"AFV", detail:"2차대전 구축전차", nation:"독일", size:"소", maker:"ACADEMY", diff:"13", date:"2024.02.17", priority:63, note:"3색 위장 단일", figure:"동봉", figureOk:"O", paintOk:"O", location:"집"},
+  {id:44, name:"HMS Warspite", genre:"SHIP", detail:"2차대전 전함", nation:"영국", size:"대", maker:"ACADEMY", diff:"14", date:"2017.02.09", priority:64, note:"", figure:"X", figureOk:"X", paintOk:"X", location:"집"},
+  {id:45, name:"1/35 FV103 CVR(T) Spartan", genre:"AFV", detail:"현용 소형병력수송장갑차", nation:"영국", size:"소", maker:"Gecko model", diff:"60", date:"2025.11.11", priority:65, note:"", figure:"", figureOk:"", paintOk:"", location:""},
+  {id:46, name:"1/35 Crusader Mk.III British Cruiser Tank", genre:"AFV", detail:"2차대전 순항전차", nation:"영국", size:"중", maker:"Boder Model", diff:"17", date:"2026.03.19", priority:66, note:"", figure:"", figureOk:"", paintOk:"", location:""},
+  {id:47, name:"1/35 Italian Armored Car Autoblinda AB 41", genre:"AFV", detail:"2차대전 장갑차", nation:"이탈리아", size:"소", maker:"LANMO Model", diff:"", date:"2026.03.19", priority:67, note:"", figure:"", figureOk:"", paintOk:"", location:""},
+  {id:48, name:"1/35 R.O.K Army K21 IFV", genre:"AFV", detail:"현용 병력수송장갑차", nation:"한국", size:"중", maker:"ACADEMY", diff:"16", date:"2026.02.17", priority:68, note:"", figure:"", figureOk:"", paintOk:"", location:""},
+  {id:49, name:"1/35 ROC (Taiwan) army M5A1 Stuart", genre:"AFV", detail:"2차대전 경전차", nation:"대만", size:"소", maker:"AFC CLUB", diff:"21", date:"2026.02.28", priority:69, note:"", figure:"", figureOk:"", paintOk:"", location:""},
+];
+
+// PAINTS (from 도료보유목록 - Tamiya enamel section)
+DATA.paints = [
+  {id:1, brand:"Tamiya 에나멜", code:"X-1 Tamiya - Black", tamiya:"X-1", vallejo:"", gunze:"2", mig:"", note:""},
+  {id:2, brand:"Tamiya 에나멜", code:"X-2 Tamiya - White", tamiya:"X-2", vallejo:"", gunze:"1", mig:"", note:""},
+  {id:3, brand:"Tamiya 에나멜", code:"X-4 Tamiya - Blue", tamiya:"X-4", vallejo:"", gunze:"15", mig:"", note:"2019.01.21 구매"},
+  {id:4, brand:"Tamiya 에나멜", code:"X-5 Tamiya - Green", tamiya:"X-5", vallejo:"", gunze:"6", mig:"", note:"2022.04.04 스프레이 구매"},
+  {id:5, brand:"Tamiya 에나멜", code:"X-7 Tamiya - Red", tamiya:"X-7", vallejo:"909", gunze:"3", mig:"", note:"2022.03.22 스프레이"},
+  {id:6, brand:"Tamiya 에나멜", code:"X-9 Brown (유광)", tamiya:"X-9", vallejo:"846", gunze:"7", mig:"", note:"2016.09.06 구매"},
+  {id:7, brand:"Tamiya 에나멜", code:"X-10 Gun Metal (유광)", tamiya:"X-10", vallejo:"863", gunze:"038 076", mig:"", note:"2010/2016 구매"},
+  {id:8, brand:"Tamiya 에나멜", code:"X-11 Chrome Silver (유광)", tamiya:"X-11", vallejo:"997", gunze:"8", mig:"", note:"2016 / 2022 구매"},
+  {id:9, brand:"Tamiya 에나멜", code:"X-12 Gold Leaf (유광)", tamiya:"X-12", vallejo:"", gunze:"9", mig:"", note:"Testors TE-1144 Gold"},
+  {id:10, brand:"Tamiya 에나멜", code:"X-22 Clear (유광)", tamiya:"X-22", vallejo:"", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:11, brand:"Tamiya 에나멜", code:"X-23 Clear Blue", tamiya:"X-23", vallejo:"", gunze:"93", mig:"", note:""},
+  {id:12, brand:"Tamiya 에나멜", code:"X-25 Clear Green", tamiya:"X-25", vallejo:"", gunze:"94", mig:"", note:"2019.01.21 구매"},
+  {id:13, brand:"Tamiya 에나멜", code:"X-26 Clear Orange", tamiya:"X-26", vallejo:"", gunze:"92", mig:"", note:""},
+  {id:14, brand:"Tamiya 에나멜", code:"X-27 Clear Red", tamiya:"X-27", vallejo:"", gunze:"90", mig:"", note:""},
+  {id:15, brand:"Tamiya 에나멜", code:"XF-1 Flat Black (무광)", tamiya:"XF-1", vallejo:"70950", gunze:"12", mig:"", note:"2016.09.06 구매"},
+  {id:16, brand:"Tamiya 에나멜", code:"XF-2 Flat White (무광)", tamiya:"XF-2", vallejo:"70951", gunze:"11", mig:"", note:"2016.09.06 구매"},
+  {id:17, brand:"Tamiya 에나멜", code:"XF-3 FLAT YELLOW", tamiya:"XF-3", vallejo:"953", gunze:"329", mig:"", note:"2022.03.08 구매"},
+  {id:18, brand:"Tamiya 에나멜", code:"XF-5 FLAT GREEN", tamiya:"XF-5", vallejo:"823 968", gunze:"340", mig:"", note:"2022.03.08 구매"},
+  {id:19, brand:"Tamiya 에나멜", code:"XF-7 FLAT RED", tamiya:"XF-7", vallejo:"909 957 947", gunze:"327", mig:"", note:""},
+  {id:20, brand:"Tamiya 에나멜", code:"XF-9 HULL RED", tamiya:"XF-9", vallejo:"859 985", gunze:"", mig:"", note:"2022.03.08 구매"},
+  {id:21, brand:"Tamiya 에나멜", code:"XF-10 FLAT BROWN", tamiya:"XF-10", vallejo:"984", gunze:"", mig:"MIG134 Burnt Brown Red", note:"2003/2022 구매"},
+  {id:22, brand:"Tamiya 에나멜", code:"XF-15 FLAT FLESH", tamiya:"XF-15", vallejo:"912 955", gunze:"44", mig:"MIG115 Light Skin Tone", note:"2022.06.02 구매"},
+  {id:23, brand:"Tamiya 에나멜", code:"XF-16 FLAT ALUMINIUM", tamiya:"XF-16", vallejo:"997 993", gunze:"", mig:"", note:"2019.01.21 구매"},
+  {id:24, brand:"Tamiya 에나멜", code:"XF-49 KHAKI", tamiya:"XF-49", vallejo:"924 988", gunze:"81", mig:"", note:""},
+  {id:25, brand:"Tamiya 에나멜", code:"XF-52 FLAT EARTH", tamiya:"XF-52", vallejo:"825 874 983", gunze:"72", mig:"MIG133 Red Leather", note:"2022.06.02 구매"},
+  {id:26, brand:"Tamiya 에나멜", code:"XF-56 METALLIC GREY", tamiya:"XF-56", vallejo:"863", gunze:"", mig:"", note:""},
+  {id:27, brand:"Tamiya 에나멜", code:"XF-57 BUFF", tamiya:"XF-57", vallejo:"819", gunze:"083 313", mig:"", note:""},
+  {id:28, brand:"Tamiya 에나멜", code:"XF-58 OLIVE GREEN", tamiya:"XF-58", vallejo:"892 890", gunze:"", mig:"", note:"2010.03.11 구매"},
+  {id:29, brand:"Tamiya 에나멜", code:"XF-59 DESERT YELLOW", tamiya:"XF-59", vallejo:"914", gunze:"", mig:"", note:"2010.03.11 구매"},
+  {id:30, brand:"Tamiya 에나멜", code:"XF-60 DARK YELLOW", tamiya:"XF-60", vallejo:"988 821 881", gunze:"71", mig:"", note:""},
+  {id:31, brand:"Tamiya 에나멜", code:"XF-61 DARK GREEN", tamiya:"XF-61", vallejo:"890", gunze:"064 073 302 309 320", mig:"", note:""},
+  {id:32, brand:"Tamiya 에나멜", code:"XF-62 OLIVE DRAB", tamiya:"XF-62", vallejo:"889 888", gunze:"078 304", mig:"", note:""},
+  {id:33, brand:"Tamiya 에나멜", code:"XF-63 GERMAN GREY", tamiya:"XF-63", vallejo:"867 995", gunze:"301", mig:"", note:""},
+  {id:34, brand:"Tamiya 에나멜", code:"XF-64 RED BROWN", tamiya:"XF-64", vallejo:"872", gunze:"", mig:"", note:"2010.03.11 구매"},
+  {id:35, brand:"Tamiya 에나멜", code:"XF-65 FIELD GREY", tamiya:"XF-65", vallejo:"890", gunze:"", mig:"", note:""},
+  // Vallejo
+  {id:100, brand:"Vallejo Model Color", code:"70317 British Tank Crew", tamiya:"", vallejo:"70317", gunze:"", mig:"", note:""},
+  {id:101, brand:"Vallejo Model Color", code:"70801 174 Brass", tamiya:"XF-6", vallejo:"70801", gunze:"10", mig:"", note:"2016.09.06 구매"},
+  {id:102, brand:"Vallejo Model Color", code:"70819 124 Iraqui Sand", tamiya:"XF-57", vallejo:"70819", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:103, brand:"Vallejo Model Color", code:"70821 103 German Camouflage Beige", tamiya:"", vallejo:"70821", gunze:"", mig:"", note:"2023.12.22 구매"},
+  {id:104, brand:"Vallejo Model Color", code:"70824 128 German Camo. Ochre", tamiya:"", vallejo:"70824", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:105, brand:"Vallejo Model Color", code:"70842 003 Glossy White", tamiya:"X-2", vallejo:"70842", gunze:"", mig:"", note:"2022.12.25 구매"},
+  {id:106, brand:"Vallejo Model Color", code:"70861 170 Glossy Black", tamiya:"X-1", vallejo:"70861", gunze:"", mig:"", note:"2022.04.04 구매"},
+  {id:107, brand:"Vallejo Model Color", code:"70863 179 Gunmetal Grey", tamiya:"", vallejo:"70863", gunze:"", mig:"", note:"2022.06.02 구매"},
+  {id:108, brand:"Vallejo Model Color", code:"70864 178 Natural Steel", tamiya:"", vallejo:"70864", gunze:"", mig:"", note:"2022.04.08 구매"},
+  {id:109, brand:"Vallejo Model Color", code:"70874 134 US Tan Earth", tamiya:"XF-52", vallejo:"70874", gunze:"N66", mig:"", note:"2022.04.04 구매"},
+  {id:110, brand:"Vallejo Model Color", code:"70875 135 Beige Brown", tamiya:"", vallejo:"70875", gunze:"", mig:"", note:"2023.12.22 구매"},
+  {id:111, brand:"Vallejo Model Color", code:"70882 118 Middle Stone", tamiya:"", vallejo:"70882", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:112, brand:"Vallejo Model Color", code:"70884 104 Stone Grey", tamiya:"XF-55", vallejo:"70884", gunze:"", mig:"", note:"2023.12.22 구매"},
+  {id:113, brand:"Vallejo Model Color", code:"70887 093 US Olive Drab", tamiya:"XF-62", vallejo:"70887", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:114, brand:"Vallejo Model Color", code:"70890 090 Reflective Green", tamiya:"XF-61/65", vallejo:"70890", gunze:"", mig:"", note:"2022.03.22 구매"},
+  {id:115, brand:"Vallejo Model Color", code:"70894 096 Russian Green", tamiya:"XF-67", vallejo:"70894", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:116, brand:"Vallejo Model Color", code:"70950 169 Black", tamiya:"XF-1", vallejo:"70950", gunze:"", mig:"", note:"2022.03.22 구매"},
+  {id:117, brand:"Vallejo Model Color", code:"70951 001 White", tamiya:"XF-2", vallejo:"70951", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:118, brand:"Vallejo Model Color", code:"70983 143 Flat Earth", tamiya:"XF-52", vallejo:"70983", gunze:"", mig:"", note:"2016.09.06 구매"},
+  {id:119, brand:"Vallejo Model Color", code:"70984 140 Flat Brown", tamiya:"", vallejo:"70984", gunze:"", mig:"", note:"2016.09.06 구매"},
+  // MIG
+  {id:200, brand:"MIG", code:"MIG0025 FS33446 Modern US Vehicles", tamiya:"", vallejo:"", gunze:"", mig:"MIG0025", note:"2023.12.22 구매"},
+  {id:201, brand:"MIG", code:"MIG0056 Green Khaki", tamiya:"", vallejo:"", gunze:"", mig:"MIG0056", note:"2023.12.22 구매"},
+  {id:202, brand:"MIG", code:"MIG0063 Pale Grey", tamiya:"", vallejo:"", gunze:"", mig:"MIG0063", note:"2023.12.22 구매"},
+  {id:203, brand:"MIG", code:"MIG0067 IDF Light Sand Grey", tamiya:"", vallejo:"", gunze:"", mig:"MIG0067", note:"2023.12.22 구매"},
+  {id:204, brand:"MIG", code:"MIG0068 IDF Green", tamiya:"", vallejo:"", gunze:"", mig:"MIG0068", note:"2023.12.22 구매"},
+  {id:205, brand:"MIG", code:"MIG0074 Green Moss", tamiya:"", vallejo:"", gunze:"", mig:"MIG0074", note:"2023.12.22 구매"},
+  {id:206, brand:"MIG", code:"Mig-0084 NATO Green", tamiya:"XF-67", vallejo:"", gunze:"", mig:"MIG0084", note:"2022.12.25 구매"},
+  {id:207, brand:"MIG", code:"Mig-0085 NATO Brown", tamiya:"XF-68", vallejo:"846", gunze:"", mig:"MIG0085", note:"2022.12.25 구매"},
+  {id:208, brand:"MIG", code:"MIG115 Light Skin Tone", tamiya:"XF-15", vallejo:"70837", gunze:"", mig:"MIG115", note:"2022.06.02 Flesh Tones 구매"},
+  {id:209, brand:"MIG", code:"MIG116 Basic Skin Tone", tamiya:"", vallejo:"70815", gunze:"", mig:"MIG116", note:"2022.06.02 Flesh Tones 구매"},
+  {id:210, brand:"MIG", code:"MIG117 Warm Skin Tone", tamiya:"", vallejo:"70804", gunze:"", mig:"MIG117", note:"2022.06.02 구매"},
+  {id:211, brand:"MIG", code:"MIG133 Red Leather", tamiya:"XF-52", vallejo:"", gunze:"", mig:"MIG133", note:"2022.06.02 구매"},
+  {id:212, brand:"MIG", code:"MIG134 Burnt Brown Red", tamiya:"XF-10", vallejo:"", gunze:"", mig:"MIG134", note:"2022.06.02 구매"},
+  {id:213, brand:"MIG", code:"Mig-0131 Real IDF Sinai Grey 82", tamiya:"", vallejo:"", gunze:"", mig:"MIG0131", note:"2022.12.25 구매"},
+  {id:214, brand:"MIG", code:"Mig-0132 Real IDF Sand Grey 73", tamiya:"", vallejo:"", gunze:"", mig:"MIG0132", note:"2022.12.25 구매"},
+  {id:215, brand:"MIG", code:"A.MIG048 Yellow", tamiya:"", vallejo:"", gunze:"", mig:"MIG048", note:"WWII Japanese 세트"},
+  {id:216, brand:"MIG", code:"A.MIG069 BLUE GREEN", tamiya:"", vallejo:"", gunze:"", mig:"MIG069", note:"WWII Japanese 세트"},
+  {id:217, brand:"MIG", code:"A.MIG071 KHAKI", tamiya:"", vallejo:"", gunze:"", mig:"MIG071", note:"WWII Japanese 세트"},
+  {id:218, brand:"MIG", code:"MIG501 카키 브라운 한국군 기갑", tamiya:"", vallejo:"", gunze:"", mig:"MIG501", note:"2023.12.22 구매"},
+  // AK
+  {id:300, brand:"AK Interactive", code:"AK11001 White - Intense", tamiya:"", vallejo:"", gunze:"", mig:"", note:""},
+  {id:301, brand:"AK Interactive", code:"AK11097 Burnt Red", tamiya:"", vallejo:"", gunze:"", mig:"", note:""},
+  {id:302, brand:"AK Interactive", code:"AK11147 Olive Green", tamiya:"", vallejo:"", gunze:"", mig:"", note:""},
+  {id:303, brand:"AK Interactive", code:"AK11209 Silver - Metallic", tamiya:"", vallejo:"", gunze:"", mig:"", note:""},
+  {id:304, brand:"AK Interactive", code:"AK11309 RAL 6003 Olivgrün Opt.1", tamiya:"", vallejo:"", gunze:"", mig:"", note:"Panzer 1937-1944 6종 세트"},
+  {id:305, brand:"AK Interactive", code:"AK11310 RAL 6003 Olivgrün Opt.2", tamiya:"", vallejo:"", gunze:"", mig:"", note:"Panzer 1937-1944 6종 세트"},
+  {id:306, brand:"AK Interactive", code:"AK11315 RAL 7017 Dunkelbraun", tamiya:"", vallejo:"", gunze:"", mig:"", note:"Panzer 1937-1944 6종 세트"},
+  {id:307, brand:"AK Interactive", code:"AK11316 RAL 7021 Dunkelgrau", tamiya:"", vallejo:"", gunze:"", mig:"", note:"Panzer 1937-1944 6종 세트"},
+  {id:308, brand:"AK Interactive", code:"AK11318 RAL 7028 Dunkelgelb (Initial)", tamiya:"", vallejo:"", gunze:"", mig:"", note:"Panzer 1937-1944 6종 세트"},
+  {id:309, brand:"AK Interactive", code:"AK11330 RAL 8017 Rotbraun", tamiya:"", vallejo:"", gunze:"", mig:"", note:"Panzer 1937-1944 6종 세트"},
+  // Gunze
+  {id:400, brand:"군제 Hobby Color", code:"N-037 Wood Brown (반광)", tamiya:"XF-52", vallejo:"70874", gunze:"N037", mig:"", note:"2022.06.02 구매"},
+  {id:401, brand:"군제 Hobby Color", code:"N-051 Light Gull Gray (유광)", tamiya:"", vallejo:"", gunze:"N051", mig:"", note:"2022.08.13 구매"},
+  {id:402, brand:"군제 Hobby Color", code:"N076 Burnt Iron (Exhaust Pipe) 메탈릭", tamiya:"", vallejo:"", gunze:"N076", mig:"", note:"2022.08.13 구매"},
+  {id:403, brand:"군제 Hobby Color", code:"N077 Tire Black", tamiya:"X-18", vallejo:"", gunze:"N077", mig:"", note:"2022.08.13 구매"},
+  {id:404, brand:"군제 Hobby Color", code:"N-085 Sail Color (무광)", tamiya:"XF-55", vallejo:"", gunze:"N085", mig:"", note:"2023.12.22 구매"},
+  {id:405, brand:"군제 Hobby Color", code:"N-086 Red Madder (유광)", tamiya:"", vallejo:"", gunze:"N086", mig:"", note:"2022.08.13 구매"},
+];
+
+// TOOLS (from 기타보유목록)
+DATA.tools = [
+  {id:1, cat:"조립 도구", type:"접착제", name:"Tamiya Extra Thin Cement (무수지)", note:""},
+  {id:2, cat:"조립 도구", type:"접착제", name:"Tamiya Multi-Purpose Cement for Clear Parts", note:"2022.01.31 구매"},
+  {id:3, cat:"조립 도구", type:"접착제", name:"아카데미 접착제", note:"2003.04.30 구매"},
+  {id:4, cat:"조립 도구", type:"접착제", name:"Tamiya Limonene Cement (오렌지향 수지 접착제)", note:"2022.12.25 구매"},
+  {id:5, cat:"조립 도구", type:"접착제", name:"타미야 87182 속건 무수지 퀵 타입 접착제 40ml", note:"2023.12.22 구매"},
+  {id:6, cat:"조립 도구", type:"접착제", name:"군제 MC132 SPB 무수지 접착제 블랙 40ml", note:"2024.04.02 구매 4,070"},
+  {id:7, cat:"조립 도구", type:"니퍼", name:"3.Peaks Mk-02 Model-Pro Plastic Nipper 120mm", note:"2022.01.31 32,000"},
+  {id:8, cat:"조립 도구", type:"니퍼", name:"다이소 공구용 니퍼", note:"2023.12.25 다이소 3,500"},
+  {id:9, cat:"조립 도구", type:"니퍼", name:"타미야 금딱지 니퍼 TM74123 샤프 포인트 얇은날", note:"2024.01.28 28,940"},
+  {id:10, cat:"조립 도구", type:"나이프", name:"정밀 나이프", note:"2010.03.11 4,200"},
+  {id:11, cat:"조립 도구", type:"핀셋", name:"F-5 곡핀셋 (보급형)", note:"2010.03.11 2,000"},
+  {id:12, cat:"조립 도구", type:"핀셋", name:"미네시마 F107 정밀 핀셋", note:"2024.04.02 8,230"},
+  {id:13, cat:"조립 도구", type:"사포", name:"Mr.Laplos Polishing Pretreatment Cloth #6000/#8000", note:"2022.03.30 구매"},
+  {id:14, cat:"조립 도구", type:"사포", name:"Tamiya Sandpaper Set P1200~P2000", note:"2016.09.06 구매"},
+  {id:15, cat:"도색도구", type:"서페이서(프라이머)", name:"Mr.Surfacer 1000-Gray (스프레이)", note:"2016/2024 구매 8,640"},
+  {id:16, cat:"도색도구", type:"서페이서(프라이머)", name:"Mr.White Surfacer 1000 (스프레이)", note:"2016.09.06 구매"},
+  {id:17, cat:"도색도구", type:"서페이서(프라이머)", name:"Mr.Finishing Surfacer 1500 - Black (스프레이)", note:"2022/2024 구매"},
+  {id:18, cat:"도색도구", type:"서페이서(프라이머)", name:"Tamiya Surface Primer - Pink (스프레이)", note:"2022.03.30 구매"},
+  {id:19, cat:"도색도구", type:"서페이서(프라이머)", name:"German Dark Yellow Primer (60ml) 바예호", note:"2024.12.21 10,200"},
+  {id:20, cat:"도색도구", type:"서페이서(프라이머)", name:"NATO Green Primer (17ml) 바예호", note:"2024.12.21 5,570"},
+  {id:21, cat:"도색도구", type:"웨더링", name:"Tamiya Weathering Master Set A", note:"2019.01.21 구매"},
+  {id:22, cat:"도색도구", type:"웨더링", name:"Tamiya Panel Line Accent Color - Black", note:"2022.01.31 구매"},
+  {id:23, cat:"도색도구", type:"웨더링", name:"Tamiya Panel Line Accent Color - Brown", note:"2022.08.13 구매"},
+  {id:24, cat:"도색도구", type:"웨더링", name:"Tamiya Panel Line Accent Color - Gray", note:"2022.08.13 구매"},
+  {id:25, cat:"도색도구", type:"웨더링", name:"AK 웨더링 세트 AK4270 Winter", note:"2024.08.07 19,200"},
+  {id:26, cat:"도색도구", type:"워싱", name:"Light Rust Wash (MIG)", note:"2019.01.29 구매"},
+  {id:27, cat:"도색도구", type:"워싱", name:"트랙 워시 (MIG)", note:"2022.03.08 구매"},
+  {id:28, cat:"도색도구", type:"워싱", name:"녹색 차량용 다크 브라운 워시 (MIG)", note:"2022.03.08 구매"},
+  {id:29, cat:"도색도구", type:"워싱", name:"다크 옐로우용 브라운 워시 (MIG)", note:"2022.03.08 구매"},
+  {id:30, cat:"도색도구", type:"워싱", name:"판저그레이용 블루 워시 (MIG)", note:"2023.02.12 구매"},
+  {id:31, cat:"도색도구", type:"필터링", name:"다크 그린용 갈색 필터링 도료 (MIG)", note:"2022.03.08 구매"},
+  {id:32, cat:"도색도구", type:"필터링", name:"옐로우 샌드색용 회색 필터링 도료 (MIG)", note:"2022.03.08 구매"},
+  {id:33, cat:"도색도구", type:"필터링", name:"AK076 나토 3색 녹색 차량용 다크 브라운 필터", note:"2024.03.22 5,830"},
+  {id:34, cat:"도색도구", type:"마감제", name:"Mr.Top Coat (무광)(스프레이)", note:"2022/2024 구매 7,410"},
+  {id:35, cat:"도색도구", type:"마감제", name:"Mr.Super Clear Gloss (유광) (스프레이)", note:"2016/2022/2024 구매"},
+  {id:36, cat:"도색도구", type:"브러쉬", name:"브러시 5개 세트 (0 00 000 00000 1)", note:"2024.04.17 ali 6,800"},
+  {id:37, cat:"도색도구", type:"브러쉬", name:"파스텔 페인트 브러시 6pc", note:"2024.07.27 ali 2,737"},
+  {id:38, cat:"도색도구", type:"마스킹테이프", name:"Tamiya Masking Tape 18mm w/Case", note:"2022.04.04 구매"},
+  {id:39, cat:"기타", type:"확대경", name:"아로 2배 6배 LED 긴자바라 집게형 확대경", note:"2022.03.10 7,800"},
+  {id:40, cat:"기타", type:"정리함", name:"Evemodel 88pcs 병 보관 운반 가방", note:"2023.12.19 ali 19,082"},
+  {id:41, cat:"기타", type:"정리함", name:"PPS-010 쿵스 원목 도료 진열장", note:"2019.02.08 45,000"},
+  {id:42, cat:"기타", type:"공구함", name:"PLAMOKOJO COMMITTEE 모델링 공구함 (퍼플)", note:"2023.11.28 35,000"},
+];
+
+// FIGURES
+DATA.figures = [
+  {id:1, set:"영국 셔먼 전차병 4set", type:"헤드셋 좌 조종수 반신상", kit:"셔먼 Firefly", note:""},
+  {id:2, set:"영국 셔먼 전차병 4set", type:"모자 안쓴 우 조종수 반신상", kit:"셔먼 Firefly", note:""},
+  {id:3, set:"영국 셔먼 전차병 4set", type:"쌍안경 맨 전차장 전신상", kit:"셔먼 Firefly", note:""},
+  {id:4, set:"미군승무원 4set", type:"조종수 반신", kit:"M4A3E2 코브라 킹", note:"M4A3E2 용 피규어랑 중복"},
+  {id:5, set:"영국전차병 여름 복장 3set", type:"조종수 반신", kit:"", note:""},
+  {id:6, set:"영국전차병 여름 복장 3set", type:"해치에 팔 얹은 전차장 2/3 반신", kit:"", note:""},
+  {id:7, set:"독일전차병 여름복장 3set", type:"서서 기댄 전신 반바지", kit:"", note:""},
+  {id:8, set:"독일전차병 여름복장 3set", type:"쌍안경 든 전신 반바지", kit:"", note:""},
+  {id:9, set:"독일전차병 여름복장 3set", type:"기대 앉은 전신 반바지", kit:"", note:""},
+  {id:10, set:"이탈리아 세모벤테 푸른 유니폼 1", type:"기대 않은 전신 (포수, 장전수)", kit:"", note:"조종수, 포수, 장전수는 푸른 유니폼"},
+  {id:11, set:"미군 승무원 4set", type:"조종수 반신", kit:"", note:"m4a3e2용으로 샀는데 중복"},
+  {id:12, set:"미니아트 밀리터리 35093 WWII Italian Tank Crew", type:"사막색 앉은 전신1", kit:"", note:""},
+  {id:13, set:"미니아트 밀리터리 35093 WWII Italian Tank Crew", type:"사막색 앉은 전신2", kit:"", note:""},
+  {id:14, set:"미니아트 밀리터리 35093 WWII Italian Tank Crew", type:"전차장 가죽 전신", kit:"", note:""},
+  {id:15, set:"미니아트 밀리터리 35105 WWII French Tank Crew", type:"앉은 가죽 자켓 전신", kit:"", note:""},
+  {id:16, set:"미니아트 밀리터리 35105 WWII French Tank Crew", type:"서 있는 가죽 자켓 전신", kit:"", note:""},
+  {id:17, set:"즈베즈다 보병 3684 Russian Tank Crew Combat", type:"조종수 전신", kit:"", note:""},
+  {id:18, set:"즈베즈다 보병 3684 Russian Tank Crew Combat", type:"전차장 전신", kit:"", note:""},
+  {id:19, set:"드래곤 6375 German Tank Crew 1939-1943", type:"기대앉은 흑색 전신", kit:"", note:""},
+  {id:20, set:"드래곤 6375 German Tank Crew 1939-1943", type:"전차장 전신 흑색", kit:"", note:""},
+  {id:21, set:"IDF 현대전 2set", type:"전차장석 전신? 반신?", kit:"", note:""},
+  {id:22, set:"핼켓 3set", type:"반내민 조종수", kit:"m18", note:""},
+  {id:23, set:"DAK 2cm flak 38 4set", type:"기총사수 반팔 전신", kit:"하노마그 17형", note:""},
+  {id:24, set:"M4A3E2 2set", type:"전차장 전신", kit:"", note:"딱히 셔먼에만 특화된 복장 아님"},
+  {id:25, set:"M36 승무원 3set", type:"가운데 헬멧", kit:"M36", note:""},
+  {id:26, set:"IDF centurion mk5 (six day war) crew 2", type:"전차장", kit:"눈물의 계곡", note:""},
+  {id:27, set:"waffen SS tank crew 4set", type:"위장무늬 전차장 일반모", kit:"Tiger 1 쿠르스크", note:""},
+  {id:28, set:"modern russia tank crew 2set", type:"반 앉은 전차장 위장 전신", kit:"", note:""},
+  {id:29, set:"WWII U.S.Army M8 Crew", type:"한쪽 다리 걸터앉은 조종수 좌측", kit:"M8 greyhound", note:""},
+  {id:30, set:"WWII U.S.Army M8 Crew", type:"전차장석에 서있는 전신", kit:"M8 greyhound", note:""},
+];
+
+// COLOR GUIDE (sample from sheets)
+DATA.colorGuide = [
+  {cat:"AFV현용-국군", model:"Academy 1/35 ROK Army K2 Black Panther", color:"Flat Black", tamiya:"XF-1 Flat Black (무광)", vallejo:"[VJ70950]169 Black", mig:"", secured:"O"},
+  {cat:"AFV현용-국군", model:"Academy 1/35 ROK Army K2 Black Panther", color:"Steel", tamiya:"", vallejo:"[VJ70863] 179 Gunmetal Grey", mig:"", secured:"O"},
+  {cat:"AFV현용-국군", model:"Academy 1/35 ROK Army K2 Black Panther", color:"Clear Blue", tamiya:"X-23 Clear Blue", vallejo:"", mig:"", secured:"O"},
+  {cat:"AFV현용-국군", model:"Academy 1/35 ROK Army K2 Black Panther", color:"Silver", tamiya:"X-11 Chrome Silver + XF-16", vallejo:"", mig:"", secured:"O"},
+  {cat:"AFV현용-국군", model:"Academy 1/35 ROK Army K2 Black Panther", color:"Brown", tamiya:"", vallejo:"[VJ70874] 134 US Tan Earth", mig:"MIG501 카키 브라운 한국군", secured:"O"},
+  {cat:"AFV현용-국군", model:"Academy 1/35 R.O.K Army K511A1 2.5ton", color:"RED", tamiya:"", vallejo:"", mig:"", secured:"O"},
+  {cat:"AFV현용-국군", model:"Academy 1/35 R.O.K Army K511A1 2.5ton", color:"OLIVE DRAB", tamiya:"TS28 Olive Drab 2", vallejo:"70887 093 US Olive Drab", mig:"", secured:"O"},
+  {cat:"AFV현용-미군", model:"RFM 1/35 JLTV M1278A1", color:"Yellow semi-gloss", tamiya:"", vallejo:"[VJ70917/916/858]", mig:"Mig-0025 FS33446 Modern US Vehicles", secured:"O"},
+  {cat:"AFV현용-미군", model:"Trumpeter 1/35 USMC LAV-25 PIRANHA", color:"Olive Drab", tamiya:"TS28 Olive Drab 2", vallejo:"", mig:"", secured:"O"},
+  {cat:"AFV현용-미군", model:"Academy 1/35 M1151 증가장갑형 고기동차량", color:"SAND YELLOW", tamiya:"TS-46, S39", vallejo:"[VJ70819]124 Iraqui Sand", mig:"MIG0025 Modern US Vehicles", secured:"△"},
+  {cat:"AFV현용-IDF", model:"M113 Fitter 2003", color:"시나이 그레이", tamiya:"", vallejo:"[VJ70884]104 Stone Grey", mig:"", secured:"O"},
+  {cat:"AFV현용-IDF", model:"Merkava Mk.2D", color:"Real IDF Sinai Grey 82", tamiya:"", vallejo:"", mig:"Mig-0131 Real IDF Sinai Grey 82", secured:"O"},
+  {cat:"AFV현용-IDF", model:"Academy IDF AMX-13/75 1967 nablus", color:"Rubber & Tires", tamiya:"", vallejo:"855 950", mig:"", secured:"O"},
+  {cat:"AFV현용-러시아", model:"Trumpeter 1/35 T-90 MBT", color:"Light Green", tamiya:"XF-20 MEDIUM GREY", vallejo:"[VJ70895]088 Gunship Green", mig:"[MIG0056] Green Khaki", secured:"△"},
+  {cat:"AFV현용-기타", model:"Miniart 1/35 T-55A 크로아티아군", color:"Russian Green", tamiya:"XF-65", vallejo:"[VJ71017] Russian Green 4BO / [VJ70890]090", mig:"[MIG0083] Russian Postwar Green", secured:"△"},
+  {cat:"WWII독일", model:"Academy 1/35 타이거-I 초기형 성채작전", color:"Flat Black", tamiya:"XF-1 Flat Black (무광)", vallejo:"[VJ70950]169 Black", mig:"", secured:"O"},
+  {cat:"WWII독일", model:"Academy 1/35 타이거-I 초기형 성채작전", color:"Dark Yellow", tamiya:"XF60", vallejo:"70821 103 German Camouflage Beige", mig:"AK11318 RAL 7028 Dunkelgelb", secured:"O"},
+  {cat:"WWII독일", model:"Academy 1/35 타이거-I 초기형 성채작전", color:"Dark Green", tamiya:"XF61", vallejo:"[VJ70890]090 Reflective Green", mig:"AK11310 RAL 6003 Olivgrün Opt.2", secured:"O"},
+  {cat:"WWII독일", model:"Academy 1/35 타이거-I 초기형 성채작전", color:"Red Brown", tamiya:"XF-64 RED BROWN", vallejo:"[VJ70984] 140 Flat Brown", mig:"AK11330 RAL 8017 Rotbraun", secured:"O"},
+  {cat:"AUTO", model:"Volkswagen 1300 Beetle 1966", color:"Fontana Grey", tamiya:"XF24:1 + X22:3", vallejo:"", mig:"", secured:""},
+  {cat:"AUTO", model:"Rover mini cooper 1.3i", color:"Gloss White", tamiya:"X-2", vallejo:"", mig:"", secured:"O"},
+  {cat:"AUTO", model:"Rover mini cooper 1.3i", color:"IJA green", tamiya:"XF-13", vallejo:"979 892", mig:"", secured:"O"},
+  {cat:"BIKE", model:"Honda NSR500", color:"WHITE", tamiya:"X-2", vallejo:"", mig:"", secured:"O"},
+  {cat:"BIKE", name:"Ducati 888 Superbike", color:"TS-8 Italian Red", tamiya:"TS-8", vallejo:"", mig:"", secured:"O"},
+];
+
+// PAINT SETS
+DATA.paintSets = [
+  {nation:"독일", set:"Panzer 1937-1944 3Gen Color Set", company:"AK Interactive", color:"AK11315 RAL 7017 DUNKELBRAUN"},
+  {nation:"독일", set:"Panzer 1937-1944 3Gen Color Set", company:"AK Interactive", color:"AK11316 RAL 7021 DUNKELGRAUN"},
+  {nation:"독일", set:"Panzer 1937-1944 3Gen Color Set", company:"AK Interactive", color:"AK11318 RAL 7028 DUNKELGELB (INITIAL)"},
+  {nation:"독일", set:"Panzer 1937-1944 3Gen Color Set", company:"AK Interactive", color:"AK11309 RAL 6003 OLIVGRUN OPT.1"},
+  {nation:"독일", set:"Panzer 1937-1944 3Gen Color Set", company:"AK Interactive", color:"AK11310 RAL 6003 OLIVGRUN OPT.2"},
+  {nation:"독일", set:"Panzer 1937-1944 3Gen Color Set", company:"AK Interactive", color:"AK11330 RAL 8017 ROTBRAUN"},
+  {nation:"독일", set:"German Standard 1943-45 3Gen Color Set", company:"AK Interactive", color:"AK11318 RAL 7028 DUNKELCELB(INITIAL)"},
+  {nation:"독일", set:"German Standard 1943-45 3Gen Color Set", company:"AK Interactive", color:"AK11319 RAL 6003 OLIVEGRUN"},
+  {nation:"독일", set:"German Standard 1943-45 3Gen Color Set", company:"AK Interactive", color:"AK11330 RAL 8017 ROTBRAUN"},
+  {nation:"러시아", set:"Soviet Camouflage 3Gen Color Set", company:"AK Interactive", color:"AK11368 RUSSIAN GREEN 4BO"},
+  {nation:"러시아", set:"Soviet Camouflage 3Gen Color Set", company:"AK Interactive", color:"AK11369 RUSSIAN DARK BROWN 6K"},
+  {nation:"러시아", set:"Soviet Camouflage 3Gen Color Set", company:"AK Interactive", color:"AK11370 RUSSIAN SAND 7K"},
+  {nation:"이스라엘", set:"IDF AFV 3Gen Color Set", company:"AK Interactive", color:"AK11352 IDF MODERN GREY"},
+  {nation:"이스라엘", set:"IDF AFV 3Gen Color Set", company:"AK Interactive", color:"AK11353 IDF SAND GREY 1970S ~ 1980S"},
+  {nation:"이스라엘", set:"IDF AFV 3Gen Color Set", company:"AK Interactive", color:"AK11354 IDF EARLY SAND YELLOW"},
+  {nation:"이스라엘", set:"ISRAEL DEFENSE FORCES SPECIAL EDITION", company:"MIG", color:"A.MIG-066 FADED SINAI GREY (IDF sinai Grey 82)"},
+  {nation:"이스라엘", set:"ISRAEL DEFENSE FORCES SPECIAL EDITION", company:"MIG", color:"A.MIG-067 LIGHT SAND GREY (IDF sinai Grey 73)"},
+  {nation:"이스라엘", set:"ISRAEL DEFENSE FORCES SPECIAL EDITION", company:"MIG", color:"A.MIG-068 IDF GREEN"},
+  {nation:"한국", set:"R.O.K.ARMY MODERN", company:"MIG", color:"A.MIG0500 KHAKI GREEN"},
+  {nation:"한국", set:"R.O.K.ARMY MODERN", company:"MIG", color:"A.MIG0501 KHAKI BROWN"},
+  {nation:"NATO", set:"NATO 3Gen Color Set", company:"AK Interactive", color:"AK11358 NATO GREEN"},
+  {nation:"NATO", set:"NATO 3Gen Color Set", company:"AK Interactive", color:"AK11359 NATO BROWN"},
+  {nation:"NATO", set:"NATO 3Gen Color Set", company:"AK Interactive", color:"AK11360 NATO BLACK"},
+  {nation:"미국", set:"Modern US Army Colors 1950~2016", company:"MIG", color:"A.MIG-025 US Modern Vehicles FS33446"},
+  {nation:"미국", set:"Modern US Army Colors 1950~2016", company:"MIG", color:"A.MIG-084 NATO Green"},
+  {nation:"미국", set:"US Tank Europe 1944-45 3Gen Color Set", company:"AK Interactive", color:"AK11339 N9 OLIVE DRAB"},
+  {nation:"일본", set:"WWII Japanese AFV Early Colors", company:"MIG", color:"A.MIG048 Yellow"},
+  {nation:"일본", set:"WWII Japanese AFV Early Colors", company:"MIG", color:"A.MIG069 BLUE GREEN"},
+  {nation:"일본", set:"WWII Japanese AFV Early Colors", company:"MIG", color:"A.MIG071 KHAKI"},
+  {nation:"프랑스", set:"Modern French Army Color Set", company:"AK Interactive", color:"AK796 NATO green"},
+  {nation:"프랑스", set:"Modern French Army Color Set", company:"AK Interactive", color:"AK797 NATO Brown"},
+  {nation:"프랑스", set:"Modern French Army Color Set", company:"AK Interactive", color:"AK4081 French Amy Desert Sand"},
+  {nation:"영국", set:"British Desert North Africa 1940-1943", company:"AK Interactive", color:"AK11374 SILVER GREY No.28"},
+  {nation:"영국", set:"British 1939-45 European ETO Colors", company:"MIG", color:"A.MIG112 SCC 15 (BRITISH 1944-45 OLIVE DRAB)"},
+  {nation:"공통", set:"TOOLS COLORS", company:"MIG", color:"A.MIG-036 OLD WOOD"},
+  {nation:"공통", set:"TOOLS COLORS", company:"MIG", color:"A.MIG-037 NEW WOOD"},
+  {nation:"공통", set:"TOOLS COLORS", company:"MIG", color:"A.MIG-045 GUN METAL"},
+];
+
+// ========== UI FUNCTIONS ==========
+
+let nextId = { completed: 1000, planned: 1000, paints: 1000, tools: 1000, figures: 1000 };
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  if(name === 'dashboard') renderDashboard();
+  else if(name === 'completed') renderCompleted();
+  else if(name === 'planned') renderPlanned();
+  else if(name === 'paints') renderPaints();
+  else if(name === 'sets') renderSets();
+  else if(name === 'tools') renderTools();
+  else if(name === 'figures') renderFigures();
+  else if(name === 'colorguide') renderColorGuide();
+}
+
+function openModal(id, ctx) {
+  if(id === 'add-model') {
+    document.getElementById('modal-model-title').textContent = ctx === 'completed' ? '완료 작품 등록' : '제작 계획 추가';
+    document.getElementById('m-completed').value = ctx === 'completed' ? 'true' : 'false';
+  }
+  document.getElementById('modal-' + id).classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function clearModelForm() {
+  ['m-name','m-genre-detail','m-nation','m-diff','m-date','m-note','m-figure','m-maker'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+}
+
+function saveModel() {
+  const name = document.getElementById('m-name').value.trim();
+  if(!name) { alert('품명을 입력해 주세요'); return; }
+  const isCompleted = document.getElementById('m-completed').value === 'true';
+  const obj = {
+    id: ++nextId[isCompleted ? 'completed' : 'planned'],
+    name, genre: document.getElementById('m-genre').value,
+    detail: document.getElementById('m-genre-detail').value,
+    nation: document.getElementById('m-nation').value,
+    size: document.getElementById('m-size').value,
+    maker: document.getElementById('m-maker').value,
+    diff: document.getElementById('m-diff').value,
+    date: document.getElementById('m-date').value,
+    note: document.getElementById('m-note').value,
+    figure: document.getElementById('m-figure').value,
+    figureOk: document.getElementById('m-figure-ok').value,
+    paintOk: document.getElementById('m-paint-ok').value,
+    location: document.getElementById('m-location').value,
+    priority: document.getElementById('m-priority').value,
+  };
+  if(isCompleted) DATA.completed.push(obj);
+  else DATA.planned.push(obj);
+  updateHeaderStats();
+  updateBadges();
+  closeModal('modal-add-model');
+  clearModelForm();
+  if(isCompleted) renderCompleted();
+  else renderPlanned();
+}
+
+function savePaint() {
+  const code = document.getElementById('p-code').value.trim();
+  if(!code) { alert('코드/색상명을 입력해 주세요'); return; }
+  DATA.paints.push({
+    id: ++nextId.paints,
+    brand: document.getElementById('p-brand').value,
+    code, tamiya: document.getElementById('p-tamiya').value,
+    vallejo: document.getElementById('p-vallejo').value,
+    gunze: document.getElementById('p-gunze').value,
+    mig: document.getElementById('p-mig').value,
+    note: document.getElementById('p-note').value,
+  });
+  updateHeaderStats(); updateBadges();
+  closeModal('modal-add-paint');
+  renderPaints();
+}
+
+function saveTool() {
+  const name = document.getElementById('t-name').value.trim();
+  if(!name) { alert('품명을 입력해 주세요'); return; }
+  DATA.tools.push({
+    id: ++nextId.tools,
+    cat: document.getElementById('t-cat').value,
+    type: document.getElementById('t-type').value,
+    name, note: document.getElementById('t-note').value,
+  });
+  updateBadges();
+  closeModal('modal-add-tool');
+  renderTools();
+}
+
+function saveFigure() {
+  const set = document.getElementById('f-set').value.trim();
+  if(!set) { alert('세트명을 입력해 주세요'); return; }
+  DATA.figures.push({
+    id: ++nextId.figures,
+    set, type: document.getElementById('f-type').value,
+    kit: document.getElementById('f-kit').value,
+    note: document.getElementById('f-note').value,
+  });
+  closeModal('modal-add-figure');
+  renderFigures();
+}
+
+function deleteItem(arr, id) {
+  if(!confirm('삭제하시겠습니까?')) return false;
+  const idx = arr.findIndex(x => x.id === id);
+  if(idx > -1) arr.splice(idx,1);
+  return true;
+}
+
+// ========== RENDER FUNCTIONS ==========
+
+function esc(s) {
+  if(!s) return '';
+  return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function securedTag(v) {
+  if(v === 'O') return '<span class="tag tag-o">확보</span>';
+  if(v === 'X') return '<span class="tag tag-x">미보유</span>';
+  if(v === '△') return '<span class="tag tag-d">대체가능</span>';
+  return '<span class="tag" style="opacity:.4">-</span>';
+}
+
+function brandPill(brand) {
+  let cls = '';
+  if(brand.includes('Tamiya')) cls = 'brand-tamiya';
+  else if(brand.includes('Vallejo')) cls = 'brand-vallejo';
+  else if(brand === 'MIG') cls = 'brand-mig';
+  else if(brand.includes('AK')) cls = 'brand-ak';
+  else if(brand.includes('군제')) cls = 'brand-gunze';
+  return `<span class="brand-pill ${cls}">${esc(brand)}</span>`;
+}
+
+function renderDashboard() {
+  document.getElementById('st-done').textContent = DATA.completed.length;
+  document.getElementById('st-plan').textContent = DATA.planned.length;
+  document.getElementById('st-paint').textContent = DATA.paints.length;
+
+  // Genre dist
+  const genreCount = {};
+  [...DATA.completed, ...DATA.planned].forEach(m => { genreCount[m.genre] = (genreCount[m.genre]||0)+1; });
+  const maxG = Math.max(...Object.values(genreCount));
+  document.getElementById('genre-dist').innerHTML = Object.entries(genreCount).map(([g,c]) =>
+    `<div class="dist-row"><div class="dist-name">${g}</div><div class="dist-bar-wrap"><div class="dist-bar" style="width:${c/maxG*100}%"></div></div><div class="dist-num">${c}</div></div>`
+  ).join('');
+
+  // Nation dist (completed)
+  const natCount = {};
+  DATA.completed.forEach(m => { if(m.nation) natCount[m.nation] = (natCount[m.nation]||0)+1; });
+  const sorted = Object.entries(natCount).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxN = sorted[0] ? sorted[0][1] : 1;
+  document.getElementById('nation-dist').innerHTML = sorted.map(([n,c]) =>
+    `<div class="dist-row"><div class="dist-name">${n}</div><div class="dist-bar-wrap"><div class="dist-bar" style="width:${c/maxN*100}%;background:var(--accent2)"></div></div><div class="dist-num">${c}</div></div>`
+  ).join('');
+
+  // Recent
+  const recent = [...DATA.completed].slice(-6).reverse();
+  document.getElementById('recent-completed').innerHTML = recent.map(m =>
+    `<div class="activity-item"><div class="activity-dot"></div><div class="activity-text"><strong>${esc(m.name)}</strong> · ${esc(m.nation)} · ${esc(m.maker)}</div><div class="activity-time">${esc(m.date)}</div></div>`
+  ).join('');
+}
+
+function renderCompleted() {
+  const q = (document.getElementById('search-completed').value||'').toLowerCase();
+  const g = document.getElementById('filter-genre-c').value;
+  const n = document.getElementById('filter-nation-c').value;
+  let rows = DATA.completed.filter(m =>
+    (!q || m.name.toLowerCase().includes(q) || (m.maker||'').toLowerCase().includes(q) || (m.nation||'').toLowerCase().includes(q)) &&
+    (!g || m.genre === g) && (!n || m.nation === n)
+  );
+  document.getElementById('ct-done-count').textContent = `(${rows.length})`;
+  document.getElementById('tbody-completed').innerHTML = rows.map(m =>
+    `<tr>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dim)">${m.id}</td>
+      <td><span style="color:var(--text-bright);font-weight:500">${esc(m.name)}</span>${m.note?`<br><span style="font-size:11px;color:var(--text-dim)">${esc(m.note.substring(0,60))}${m.note.length>60?'...':''}</span>`:''}</td>
+      <td>${esc(m.genre)}</td>
+      <td>${esc(m.nation)}</td>
+      <td>${esc(m.maker)}</td>
+      <td>${esc(m.size)||'-'}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${esc(m.date)}</td>
+      <td><button class="action-btn" onclick="if(deleteItem(DATA.completed,${m.id})){updateHeaderStats();updateBadges();renderCompleted();}">삭제</button></td>
+    </tr>`
+  ).join('') || '<tr><td colspan="8" class="empty"><div class="empty-icon">🔍</div>검색 결과 없음</td></tr>';
+
+  // populate nation filter
+  const nations = [...new Set(DATA.completed.map(m=>m.nation).filter(Boolean))].sort();
+  const sel = document.getElementById('filter-nation-c');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">전체 국가</option>' + nations.map(n=>`<option${cur===n?' selected':''}>${n}</option>`).join('');
+}
+
+function renderPlanned() {
+  const q = (document.getElementById('search-planned').value||'').toLowerCase();
+  const g = document.getElementById('filter-genre-p').value;
+  const n = document.getElementById('filter-nation-p').value;
+  let rows = DATA.planned.filter(m =>
+    (!q || m.name.toLowerCase().includes(q) || (m.maker||'').toLowerCase().includes(q) || (m.nation||'').toLowerCase().includes(q)) &&
+    (!g || m.genre === g) && (!n || m.nation === n)
+  ).sort((a,b)=>(+a.priority||999)-(+b.priority||999));
+  document.getElementById('ct-plan-count').textContent = `(${rows.length})`;
+  document.getElementById('tbody-planned').innerHTML = rows.map(m =>
+    `<tr>
+      <td class="priority">${m.priority||'-'}</td>
+      <td><span style="color:var(--text-bright);font-weight:500">${esc(m.name)}</span>${m.note?`<br><span style="font-size:11px;color:var(--text-dim)">${esc(m.note.substring(0,60))}${m.note.length>60?'...':''}</span>`:''}</td>
+      <td>${esc(m.genre)}</td>
+      <td>${esc(m.nation)}</td>
+      <td>${esc(m.size)||'-'}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:12px">${m.diff||'-'}</td>
+      <td>${esc(m.maker)}</td>
+      <td>${securedTag(m.figureOk)}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${esc(m.location)||'-'}</td>
+      <td><button class="action-btn" onclick="if(deleteItem(DATA.planned,${m.id})){updateHeaderStats();updateBadges();renderPlanned();}">삭제</button></td>
+    </tr>`
+  ).join('') || '<tr><td colspan="10" class="empty"><div class="empty-icon">📋</div>제작 계획이 없습니다</td></tr>';
+
+  const nations = [...new Set(DATA.planned.map(m=>m.nation).filter(Boolean))].sort();
+  const sel = document.getElementById('filter-nation-p');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">전체 국가</option>' + nations.map(n=>`<option${cur===n?' selected':''}>${n}</option>`).join('');
+}
+
+function renderPaints() {
+  const q = (document.getElementById('search-paint').value||'').toLowerCase();
+  const b = document.getElementById('filter-brand').value;
+  let rows = DATA.paints.filter(p =>
+    (!q || p.code.toLowerCase().includes(q) || (p.tamiya||'').toLowerCase().includes(q) || (p.vallejo||'').toLowerCase().includes(q)) &&
+    (!b || p.brand === b)
+  );
+  document.getElementById('ct-paint-count').textContent = `(${rows.length})`;
+  document.getElementById('tbody-paints').innerHTML = rows.map(p =>
+    `<tr>
+      <td>${brandPill(p.brand)}</td>
+      <td style="font-weight:500;color:var(--text-bright)">${esc(p.code)}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${esc(p.tamiya)||'-'}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${esc(p.vallejo)||'-'}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${esc((p.note||'').substring(0,50))}</td>
+      <td><button class="action-btn" onclick="if(deleteItem(DATA.paints,${p.id})){updateHeaderStats();updateBadges();renderPaints();}">삭제</button></td>
+    </tr>`
+  ).join('') || '<tr><td colspan="6" class="empty"><div class="empty-icon">🎨</div>도료 없음</td></tr>';
+}
+
+function renderSets() {
+  const q = (document.getElementById('search-sets').value||'').toLowerCase();
+  const n = document.getElementById('filter-set-nation').value;
+  const c = document.getElementById('filter-set-company').value;
+  let rows = DATA.paintSets.filter(s =>
+    (!q || s.set.toLowerCase().includes(q) || s.color.toLowerCase().includes(q)) &&
+    (!n || s.nation === n) && (!c || s.company === c)
+  );
+  document.getElementById('tbody-sets').innerHTML = rows.map(s =>
+    `<tr>
+      <td style="font-weight:500;color:var(--accent)">${esc(s.nation)}</td>
+      <td>${esc(s.set)}</td>
+      <td>${brandPill(s.company)}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:12px">${esc(s.color)}</td>
+    </tr>`
+  ).join('') || '<tr><td colspan="4" class="empty"><div class="empty-icon">📦</div>검색 결과 없음</td></tr>';
+
+  const nations = [...new Set(DATA.paintSets.map(s=>s.nation).filter(Boolean))].sort();
+  const sel = document.getElementById('filter-set-nation');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">전체 국가</option>' + nations.map(nn=>`<option${cur===nn?' selected':''}>${nn}</option>`).join('');
+}
+
+function renderTools() {
+  const q = (document.getElementById('search-tools').value||'').toLowerCase();
+  const c = document.getElementById('filter-toolcat').value;
+  let rows = DATA.tools.filter(t =>
+    (!q || t.name.toLowerCase().includes(q) || (t.type||'').toLowerCase().includes(q)) &&
+    (!c || t.cat === c)
+  );
+  document.getElementById('ct-tools-count').textContent = `(${rows.length})`;
+  document.getElementById('tbody-tools').innerHTML = rows.map(t =>
+    `<tr>
+      <td style="color:var(--accent);font-weight:500">${esc(t.cat)}</td>
+      <td style="font-size:12px;color:var(--text-dim)">${esc(t.type)||'-'}</td>
+      <td style="font-weight:500">${esc(t.name)}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${esc((t.note||'').substring(0,60))}</td>
+      <td><button class="action-btn" onclick="if(deleteItem(DATA.tools,${t.id})){updateBadges();renderTools();}">삭제</button></td>
+    </tr>`
+  ).join('') || '<tr><td colspan="5" class="empty"><div class="empty-icon">🔧</div>장비 없음</td></tr>';
+}
+
+function renderFigures() {
+  const q = (document.getElementById('search-figures').value||'').toLowerCase();
+  let rows = DATA.figures.filter(f =>
+    !q || f.set.toLowerCase().includes(q) || (f.kit||'').toLowerCase().includes(q) || (f.type||'').toLowerCase().includes(q)
+  );
+  document.getElementById('tbody-figures').innerHTML = rows.map(f =>
+    `<tr>
+      <td style="font-weight:500;color:var(--text-bright)">${esc(f.set)}</td>
+      <td>${esc(f.type)||'-'}</td>
+      <td style="color:var(--accent2)">${esc(f.kit)||'-'}</td>
+      <td style="font-size:11px;color:var(--text-dim)">${esc(f.note||'')}</td>
+      <td><button class="action-btn" onclick="if(deleteItem(DATA.figures,${f.id})){renderFigures();}">삭제</button></td>
+    </tr>`
+  ).join('') || '<tr><td colspan="5" class="empty"><div class="empty-icon">🎖️</div>피규어 없음</td></tr>';
+}
+
+function renderColorGuide() {
+  const q = (document.getElementById('search-cg').value||'').toLowerCase();
+  const cat = document.getElementById('filter-cg-category').value;
+  let rows = DATA.colorGuide.filter(c =>
+    (!q || (c.model||c.name||'').toLowerCase().includes(q) || (c.color||'').toLowerCase().includes(q)) &&
+    (!cat || c.cat === cat)
+  );
+  document.getElementById('tbody-cg').innerHTML = rows.map(c =>
+    `<tr>
+      <td style="font-size:11px;color:var(--accent)">${esc(c.cat)}</td>
+      <td style="font-weight:500;max-width:200px">${esc(c.model||c.name||'')}</td>
+      <td style="color:var(--text-bright)">${esc(c.color)}</td>
+      <td style="font-size:11px;font-family:'Space Mono',monospace">${esc(c.tamiya||'-')}</td>
+      <td style="font-size:11px;font-family:'Space Mono',monospace">${esc(c.vallejo||'-')}</td>
+      <td style="font-size:11px;font-family:'Space Mono',monospace">${esc(c.mig||'-')}</td>
+      <td>${securedTag(c.secured)}</td>
+    </tr>`
+  ).join('') || '<tr><td colspan="7" class="empty"><div class="empty-icon">🗺️</div>검색 결과 없음</td></tr>';
+}
+
+function updateHeaderStats() {
+  document.getElementById('hs-models').textContent = DATA.completed.length + DATA.planned.length;
+  document.getElementById('hs-done').textContent = DATA.completed.length;
+  document.getElementById('hs-planned').textContent = DATA.planned.length;
+  document.getElementById('hs-paints').textContent = DATA.paints.length;
+}
+
+function updateBadges() {
+  document.getElementById('nb-done').textContent = DATA.completed.length;
+  document.getElementById('nb-plan').textContent = DATA.planned.length;
+  document.getElementById('nb-paint').textContent = DATA.paints.length;
+  document.getElementById('nb-tools').textContent = DATA.tools.length;
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if(e.target === this) this.classList.remove('active');
+  });
+});
+
+// INIT
+updateHeaderStats();
+updateBadges();
+renderDashboard();
+</script>
+</body>
+</html>
